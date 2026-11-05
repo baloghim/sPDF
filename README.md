@@ -6,7 +6,7 @@ Könnyű, natív C++/Win32 PDF-megtekintő Windows x64 rendszerre. Magyar felül
 
 Ez az első működő fejlesztői változat, nem a teljes 1.0 alkalmazás. [Kiadási jegyzetek és ellenőrzőösszeg](https://github.com/baloghim/sPDF/releases/tag/v0.1.0-preview).
 
-**Tervezett minimum: Windows 10 1607 (14393), x64. A kompatibilitás tényleges 1607 gépen még nem igazolt.** A keresztfordítás és a Wine-próba ezt nem helyettesíti.
+**Minimum célrendszer: Windows 10 1607 (14393), x64.** A `v0.1.0-preview` kiadás működését a felhasználó a célrendszeren visszaigazolta (2026. november 5.). [Kompatibilitási feljegyzés](docs/PDFium.md#windows-10-1607).
 
 ## Letöltés és indítás
 

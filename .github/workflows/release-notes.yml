@@ -1,0 +1,19 @@
+name: Preview release notes
+on:
+  push:
+    branches: [main]
+    paths: [docs/RELEASE-0.1.0.md]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  update-notes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update published preview notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit v0.1.0-preview --notes-file docs/RELEASE-0.1.0.md

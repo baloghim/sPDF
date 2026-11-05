@@ -13,10 +13,14 @@ Ez a technológiai alap rögzített, V8/XFA nélküli motorverziója, nem a mind
 
 ## Windows 10 1607
 
-**Nem igazolt.** A szállítói csomag nem tartalmaz kifejezett Windows 10 1607 futtatási garanciát. Korábbi Windows 10-korszakbeli, kis függőségű motort választottunk kiindulópontnak; a verzió és a rendszer-DLL-ek neve önmagában nem bizonyít minimális Windows-buildet.
+**A `v0.1.0-preview` kiadás működését a felhasználó a Windows 10 1607 célrendszeren visszaigazolta, 2026. november 5-én.** Visszajelzése: „A kompatibilitás pipa, a kiadás működik a célrendszeren.” Ez tényleges célrendszeri használatról szóló felhasználói visszajelzés.
+
+A visszaigazolás a GitHubon publikált MSVC x64 kiadásra vonatkozik, a mellékelt PDFium 134.0.6996.0 DLL-lel. A tesztelt ZIP SHA-256 azonosítója: `12813a5b1f36ee5fd958ebc839e7bc3be6a4d0bae4b07c0121ca64294398457f`. A külön kipróbált funkciók részletes listáját a visszajelzés nem tartalmazza.
+
+A szállítói csomag továbbra sem tartalmaz külön Windows 10 1607 garanciát. A célrendszeri visszaigazolás az adott alkalmazáskiadásra érvényes; későbbi PDFium- vagy fordítóverzió cseréjénél a kompatibilitást újra ellenőrizni kell.
 
 Az alkalmazás `_WIN32_WINNT=0x0A00`, `WINVER=0x0A00`, x64 és `asInvoker` beállítással készül. A manifest újabb DPI-viselkedést és PerMonitor visszaesést deklarál; közvetlenül nem hívunk újabb DPI API-t, például `GetDpiForWindow`-t. Az EXE melletti DLL abszolút útvonalról, korlátozott függőségkereséssel töltődik be.
 
-A használt Win32 alap API-k elérhetők a célrendszeren. A PDFium és a fordítók által generált teljes API-importkészlet tényleges rendszerpróbát igényel. A ZIP-ellenőrzés x64 PE-képet és mellékelt DLL-eket ellenőriz, nem tanúsítja az egyes API-k minimum Windows-verzióját.
+A használt Win32 alap API-k elérhetők a célrendszeren. A ZIP-ellenőrzés x64 PE-képet és mellékelt DLL-eket ellenőriz; a célrendszeri működést a fenti felhasználói visszajelzés igazolja.
 
-Szükséges ellenőrzés Windows build 14393 gépen, külön telepített VC runtime nélkül: indítás, szöveges/szkennelt/titkosított PDF, Unicode-fájlnév, lapozás, renderelés, több DPI-beállítás, importkészlet, indulási idő és memóriahasználat. Wine-siker nem helyettesíti ezt.
+A további kiadások célrendszeri ellenőrzéseihez: indítás, szöveges/szkennelt/titkosított PDF, Unicode-fájlnév, lapozás, renderelés, több DPI-beállítás és az importkészlet. Az indulási idő és memóriahasználat mérését külön kell dokumentálni; ilyen méréseket a mostani visszajelzés nem tartalmaz.

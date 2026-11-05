@@ -1,6 +1,6 @@
 # 0.1.0 fejlesztői előzetes – jelentés
 
-2026. november 5. Az 1.0 specifikáció első technológiai mérföldkövéből működő, kipróbálható alap készült. Nem állítjuk késznek az 1.0 verziót vagy a teljes első mérföldkövet: a cél-Windows kompatibilitási próbája nyitott.
+2026. november 5. Az 1.0 specifikáció első technológiai alapja működik, a `v0.1.0-preview` kiadás cél-Windows alatti működését a felhasználó visszaigazolta. Az 1.0 teljes funkcionalitása még fejlesztés alatt áll.
 
 ## Előállított helyi MinGW-csomag
 
@@ -22,7 +22,11 @@ A [v0.1.0-preview fejlesztői kiadás](https://github.com/baloghim/sPDF/releases
 
 A [42031609343 számú GitHub Actions futás](https://github.com/baloghim/sPDF/actions/runs/42031609343) Windows Server 2022 runneren, MSVC x64 Release konfigurációban sikeres fordítást, PDFium-integrációs tesztet, főablak-megjelenítési próbát, ZIP- és függőségellenőrzést végzett. Csak ezek után publikálta a fejlesztői kiadást és a ZIP-et az ellenőrzőösszegével. A kiadási címke a `0f8808847232efeb65364e144eb1ce0bb2b43dbc` forráscommitot jelöli.
 
-A GitHubról visszatöltött ZIP SHA-256 ellenőrzése és a `check-package.py` vizsgálata is sikeres. A csomag 39 bejegyzést tartalmaz, az EXE és a PDFium x64 architektúrájú, közvetlenül csak Windows rendszer-DLL-eket importál. Ez a natív Windows build ellenőrzése; a Windows 10 1607 kompatibilitását továbbra sem igazolja.
+A GitHubról visszatöltött ZIP SHA-256 ellenőrzése és a `check-package.py` vizsgálata is sikeres. A csomag 39 bejegyzést tartalmaz, az EXE és a PDFium x64 architektúrájú, közvetlenül csak Windows rendszer-DLL-eket importál.
+
+## Célrendszeri visszaigazolás
+
+2026. november 5-én a felhasználó a publikált `v0.1.0-preview` kiadás működését a Windows 10 1607 célrendszeren visszaigazolta: „A kompatibilitás pipa, a kiadás működik a célrendszeren.” A visszajelzés a fenti SHA-256 azonosítójú GitHub-kiadáshoz tartozik. Részletes funkciólista és teljesítménymérés nem szerepelt benne. Lásd `PDFium.md`.
 
 ## Végrehajtott ellenőrzések
 
@@ -50,14 +54,13 @@ A mesterséges teszt-PDF-ek ReportLab és pypdf használatával készültek; nin
 
 ## Nyitott és nem végrehajtott ellenőrzések
 
-- **Tényleges Windows 10 1607 futtatás nem történt.** A PDFium szállítója nem ad erre a buildre konkrét garanciát. Lásd `PDFium.md`.
-- A natív MSVC fordítás és tesztek GitHub Actions Windows Server 2022 runneren már sikeresek; a Windows 10 1607 és a célhardver külön ellenőrzése maradt nyitva.
-- Fizikai nyomtató, HDD-s célhardver, indulási idő és teljes processzmemória nincs tesztelve/mérve. A jelenlegi változat nem tartalmaz nyomtatási funkciót.
+- A natív MSVC fordítás és tesztek GitHub Actions Windows Server 2022 runneren sikeresek; a Windows 10 1607 célrendszeri működés felhasználói visszaigazolása is megtörtént. A részletes célrendszeri funkciómátrix még nincs dokumentálva.
+- Fizikai nyomtató, HDD-s célhardver-teljesítmény, indulási idő és teljes processzmemória nincs tesztelve/mérve. A jelenlegi változat nem tartalmaz nyomtatási funkciót.
 - A jelszókérő párbeszéd UI-kezelése, a többmonitoros DPI-váltás és a nagy valós dokumentumkészlet manuális Windows-próbája nyitott. A titkosított PDF motoroldali megnyitása tesztelt.
 - A rögzített PDFium történeti alapverzió; stabil kiadás előtt frissítési és biztonsági felülvizsgálat szükséges.
 
 ## Következő funkcionális mérföldkövek
 
-Dokumentumfülek és közös munkaváltozat, folyamatos nézet, keresés, INI-beállítások; majd Oldalrendező stabil oldalazonosítóval, visszavonás/újra, minőségmegőrző PDF-export és saját nyomtatási felület. Végül célhardvermérés, Windows 10 1607 teszt és hivatalos 1.0 kiadás. A jelenlegi kiadás egyiket sem tünteti fel elkészültként.
+Dokumentumfülek és közös munkaváltozat, folyamatos nézet, keresés, INI-beállítások; majd Oldalrendező stabil oldalazonosítóval, visszavonás/újra, minőségmegőrző PDF-export és saját nyomtatási felület. Végül célhardvermérés, az új kiadások Windows 10 1607 regressziós próbája és hivatalos 1.0 kiadás. A jelenlegi kiadás a még hiányzó funkciókat nem tünteti fel elkészültként.
 
 A létrehozott fájlok teljes felsorolása: `FILES.txt`. A korábbi README tartalmát kibővítettük, az eredeti ikontéma-archívumot változatlanul megtartottuk.

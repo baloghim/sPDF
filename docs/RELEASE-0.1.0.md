@@ -6,7 +6,7 @@ Elkészült: magyar Win32 főablak, valódi PDFium-renderelés háttérszálon, 
 
 Ez a ZIP a GitHub Actions Windows x64 MSVC Release buildjének ellenőrzött eredménye: a PDFium integrációs tesztjei, az első oldal főablakban történő megjelenítési próbája és a hordozható csomag ellenőrzése sikeresen lefutott a publikálás előtt. A mellékelt `.sha256` fájl a ZIP ellenőrzőösszege.
 
-**A Windows 10 1607 kompatibilitása még nem igazolt tényleges 1607 rendszeren.** A Windows Server 2022 GitHub runneren végzett ellenőrzés nem helyettesíti ezt. A rögzített PDFium 134.0.6996.0 történeti alapverzió, stabil kiadás előtt frissítési felülvizsgálat szükséges.
+**A kiadás működését a felhasználó a Windows 10 1607 célrendszeren visszaigazolta (2026. november 5.).** Ez a jelenleg publikált `v0.1.0-preview` csomagra vonatkozik. Részletes funkciólista és teljesítménymérés nem szerepelt a visszajelzésben. A rögzített PDFium 134.0.6996.0 történeti alapverzió, stabil kiadás előtt frissítési felülvizsgálat szükséges.
 
 Ez még nem az 1.0 változat. Egyszerre egy PDF kezelhető. Dokumentumfülek, folyamatos nézet, Oldalrendező, szövegkereső felület, PDF-export és nyomtatás még nincs benne.
 

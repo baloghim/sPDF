@@ -1,6 +1,7 @@
 Új fájlok (a generált build- és dist-könyvtárak nélkül):
 
 .gitattributes
+.github/workflows/release-notes.yml
 .github/workflows/windows.yml
 .gitignore
 CMakeLists.txt
