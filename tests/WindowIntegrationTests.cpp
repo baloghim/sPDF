@@ -103,12 +103,30 @@ struct WindowSession {
             auto* s = reinterpret_cast<Search*>(context); DWORD pid = 0; GetWindowThreadProcessId(hwnd, &pid);
             wchar_t name[64]{}; GetClassNameW(hwnd, name, 64);
             const HWND confirm = GetDlgItem(hwnd, IDOK);
-            if (pid == s->pid && std::wstring(name) == L"#32770" && IsWindowVisible(hwnd) && IsWindowEnabled(hwnd) &&
+            const auto caption = text(hwnd);
+            const bool matching = s->password ? caption.find(L"Jelszóval védett PDF") != std::wstring::npos :
+                caption.find(L"Dokumentumhiba") != std::wstring::npos;
+            if (pid == s->pid && std::wstring(name) == L"#32770" && matching && IsWindowVisible(hwnd) && IsWindowEnabled(hwnd) &&
                 confirm && IsWindowVisible(confirm) && IsWindowEnabled(confirm) &&
-                (GetDlgItem(hwnd, IDC_PASSWORD) != nullptr) == s->password) { s->found = hwnd; return FALSE; }
+                (!s->password || GetDlgItem(hwnd, IDC_PASSWORD))) { s->found = hwnd; return FALSE; }
             return TRUE;
         }, reinterpret_cast<LPARAM>(&search));
         return search.found;
+    }
+    void diagnose() {
+        std::wcerr << L"UI state: tabs=" << count() << L" title=" << text(window) << L" status=" << status(5) << L'\n';
+        EnumWindows([](HWND hwnd, LPARAM) -> BOOL {
+            DWORD pid = 0; GetWindowThreadProcessId(hwnd, &pid);
+            if (pid != GetCurrentProcessId()) return TRUE;
+            wchar_t name[80]{}; GetClassNameW(hwnd, name, 80);
+            std::wcerr << L"Window: " << name << L" title=" << text(hwnd) << L" visible=" << IsWindowVisible(hwnd) << L" enabled=" << IsWindowEnabled(hwnd) << L'\n';
+            if (std::wstring(name) == L"#32770") EnumChildWindows(hwnd, [](HWND child, LPARAM) -> BOOL {
+                wchar_t type[80]{}; GetClassNameW(child, type, 80);
+                std::wcerr << L"  Control: " << type << L" id=" << GetDlgCtrlID(child) << L" visible=" << IsWindowVisible(child) << L" enabled=" << IsWindowEnabled(child) << L'\n';
+                return TRUE;
+            }, 0);
+            return TRUE;
+        }, 0);
     }
 };
 }
@@ -156,7 +174,8 @@ int main(int argc, char** argv) {
         }
         {
             WindowSession app({a, fixtures / "broken.pdf", b});
-            wait([&] { return app.dialog(false) != nullptr; }, "Corrupt document error not shown");
+            try { wait([&] { return app.dialog(false) != nullptr; }, "Corrupt document error not shown"); }
+            catch (...) { app.diagnose(); throw; }
             const auto errorDialog = app.dialog(false);
             SendMessageW(GetDlgItem(errorDialog, IDOK), BM_CLICK, 0, 0);
             wait([&] { return !IsWindow(errorDialog); }, "Error dialog did not close");
