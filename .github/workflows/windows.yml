@@ -17,16 +17,30 @@ jobs:
       - name: Build
         run: cmake --build build --config Release --parallel 2
       - name: Test actual Windows PDFium DLL
+        id: tests
         shell: pwsh
         run: |
+          $PSNativeCommandUseErrorActionPreference = $false
           ctest --test-dir build -C Release --output-on-failure --no-tests=error -V *> build/test-output.txt
           $testExit = $LASTEXITCODE
           Get-Content build/test-output.txt
+          exit $testExit
+      - name: Report Windows integration tests
+        if: always()
+        shell: pwsh
+        env:
+          TEST_OUTCOME: ${{ steps.tests.outcome }}
+        run: |
+          if (-not (Test-Path build/test-output.txt)) { exit 0 }
           '## Windows integration tests' | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           '```text' | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           Get-Content build/test-output.txt | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           '```' | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
-          exit $testExit
+          if ($env:TEST_OUTCOME -eq 'failure') {
+            $report = Get-Content build/test-output.txt -Raw
+            $escaped = $report.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            Write-Output "::error title=Windows CTest report::$escaped"
+          }
       - name: Test first page in the actual main window
         shell: pwsh
         run: |
