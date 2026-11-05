@@ -17,7 +17,16 @@ jobs:
       - name: Build
         run: cmake --build build --config Release --parallel 2
       - name: Test actual Windows PDFium DLL
-        run: ctest --test-dir build -C Release --output-on-failure --no-tests=error
+        shell: pwsh
+        run: |
+          ctest --test-dir build -C Release --output-on-failure --no-tests=error -V *> build/test-output.txt
+          $testExit = $LASTEXITCODE
+          Get-Content build/test-output.txt
+          '## Windows integration tests' | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          '```text' | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          Get-Content build/test-output.txt | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          '```' | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          exit $testExit
       - name: Test first page in the actual main window
         shell: pwsh
         run: |
