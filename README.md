@@ -2,15 +2,17 @@
 
 Könnyű, natív C++/Win32 PDF-megtekintő Windows x64 rendszerre. Magyar felület, PDFium motor, KDE Modern Classic ikonok; telepítés és .NET nélkül.
 
-**0.1.0 előzetes – még nincs publikált GitHub Release.** Ez az első működő fejlesztői változat, nem a teljes 1.0 alkalmazás.
+**[Windows x64 fejlesztői előzetes letöltése – 0.1.0](https://github.com/baloghim/sPDF/releases/download/v0.1.0-preview/sPDF-0.1.0-preview-win-x64.zip)**
+
+Ez az első működő fejlesztői változat, nem a teljes 1.0 alkalmazás. [Kiadási jegyzetek és ellenőrzőösszeg](https://github.com/baloghim/sPDF/releases/tag/v0.1.0-preview).
 
 **Tervezett minimum: Windows 10 1607 (14393), x64. A kompatibilitás tényleges 1607 gépen még nem igazolt.** A keresztfordítás és a Wine-próba ezt nem helyettesíti.
 
 ## Letöltés és indítás
 
-A helyben előállított ZIP: `dist/sPDF-0.1.0-preview-win-x64.zip`.
+A [0.1.0 fejlesztői kiadás](https://github.com/baloghim/sPDF/releases/tag/v0.1.0-preview) ZIP-je a GitHub Actions natív Windows x64 MSVC Release buildjéből készült. A fordítás, a PDFium-integrációs tesztek, a főablak elsőoldal-megjelenítési próbája és a csomagellenőrzés sikeresen lefutott a publikálás előtt. [Ellenőrzött kiadási folyamat](https://github.com/baloghim/sPDF/actions/runs/42031609343).
 
-A [Windows x64 preview workflow](https://github.com/baloghim/sPDF/actions/workflows/windows.yml) sikeres futása után a ZIP a futás **Artifacts** részéből tölthető le. Manuálisan is indítható. A workflow csak a változások GitHubra kerülése után jelenik meg és fut le; helyi elkészítése nem jelent publikált artifactot.
+A [Windows x64 preview workflow](https://github.com/baloghim/sPDF/actions/workflows/windows.yml) sikeres futása után a ZIP a futás **Artifacts** részéből is tölthető le. Manuálisan is indítható; a `main` ágat ellenőrzi, a `v0.1.0-preview` címke pedig sikeres ellenőrzések után fejlesztői kiadást publikál. Helyi fordításkor a csomag a `dist/sPDF-0.1.0-preview-win-x64.zip` fájl.
 
 Bontsa ki a ZIP-et, majd a benne lévő `sPDF` mappában indítsa az `sPDF.exe` fájlt. Az EXE és a `pdfium.dll` maradjon ugyanabban a mappában. Nincs telepítő vagy rendszergazdai jogosultságigény. A program nem végez telemetriát és futás közben nem tölt le függőségeket.
 

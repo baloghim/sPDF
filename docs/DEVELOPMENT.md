@@ -2,7 +2,7 @@
 
 2026. november 5. Az 1.0 specifikáció első technológiai mérföldkövéből működő, kipróbálható alap készült. Nem állítjuk késznek az 1.0 verziót vagy a teljes első mérföldkövet: a cél-Windows kompatibilitási próbája nyitott.
 
-## Előállított program
+## Előállított helyi MinGW-csomag
 
 `dist/sPDF-0.1.0-preview-win-x64.zip`, 3 927 872 bájt. Egyetlen felső szintű `sPDF` mappa, benne `sPDF.exe`, `pdfium.dll`, `README.txt`, licencek és a használt ikonok forrásai. Telepítő, .NET vagy külön GCC runtime DLL nincs benne és nem szükséges. SHA-256:
 
@@ -10,7 +10,19 @@
 10272a9cb9d4e428f4d9fa2829536824b68a6703c3e8df4bc3a1952b0ec97e08
 ```
 
-Ez helyben létrehozott fejlesztői csomag. GitHub Release és GitHub Actions artifact még nincs publikálva. A workflow megírása nem azonos a GitHubon végrehajtott builddel.
+Ez a korábbi helyi MinGW keresztfordítás csomagja. A később publikált GitHub-kiadás natív MSVC buildből készült, ezért a két ZIP mérete és ellenőrzőösszege eltér.
+
+## GitHubon publikált Windows-kiadás
+
+A [v0.1.0-preview fejlesztői kiadás](https://github.com/baloghim/sPDF/releases/tag/v0.1.0-preview) elérhető. A [Windows x64 ZIP](https://github.com/baloghim/sPDF/releases/download/v0.1.0-preview/sPDF-0.1.0-preview-win-x64.zip) **3 712 618 bájt**; SHA-256:
+
+```text
+12813a5b1f36ee5fd958ebc839e7bc3be6a4d0bae4b07c0121ca64294398457f
+```
+
+A [42031609343 számú GitHub Actions futás](https://github.com/baloghim/sPDF/actions/runs/42031609343) Windows Server 2022 runneren, MSVC x64 Release konfigurációban sikeres fordítást, PDFium-integrációs tesztet, főablak-megjelenítési próbát, ZIP- és függőségellenőrzést végzett. Csak ezek után publikálta a fejlesztői kiadást és a ZIP-et az ellenőrzőösszegével. A kiadási címke a `0f8808847232efeb65364e144eb1ce0bb2b43dbc` forráscommitot jelöli.
+
+A GitHubról visszatöltött ZIP SHA-256 ellenőrzése és a `check-package.py` vizsgálata is sikeres. A csomag 39 bejegyzést tartalmaz, az EXE és a PDFium x64 architektúrájú, közvetlenül csak Windows rendszer-DLL-eket importál. Ez a natív Windows build ellenőrzése; a Windows 10 1607 kompatibilitását továbbra sem igazolja.
 
 ## Végrehajtott ellenőrzések
 
@@ -39,7 +51,7 @@ A mesterséges teszt-PDF-ek ReportLab és pypdf használatával készültek; nin
 ## Nyitott és nem végrehajtott ellenőrzések
 
 - **Tényleges Windows 10 1607 futtatás nem történt.** A PDFium szállítója nem ad erre a buildre konkrét garanciát. Lásd `PDFium.md`.
-- A Windows MSVC buildhez és natív tesztekhez a `.github/workflows/windows.yml` elkészült; ebben a Linux-feladatban nem futott le GitHubon vagy Windows gépen.
+- A natív MSVC fordítás és tesztek GitHub Actions Windows Server 2022 runneren már sikeresek; a Windows 10 1607 és a célhardver külön ellenőrzése maradt nyitva.
 - Fizikai nyomtató, HDD-s célhardver, indulási idő és teljes processzmemória nincs tesztelve/mérve. A jelenlegi változat nem tartalmaz nyomtatási funkciót.
 - A jelszókérő párbeszéd UI-kezelése, a többmonitoros DPI-váltás és a nagy valós dokumentumkészlet manuális Windows-próbája nyitott. A titkosított PDF motoroldali megnyitása tesztelt.
 - A rögzített PDFium történeti alapverzió; stabil kiadás előtt frissítési és biztonsági felülvizsgálat szükséges.
