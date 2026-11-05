@@ -43,6 +43,12 @@ PdfDocument::~PdfDocument() {
     if (document_) api_.FPDF_CloseDocument(document_);
     if (file_ != INVALID_HANDLE_VALUE) CloseHandle(file_);
 }
+std::wstring PdfDocument::identity() const {
+    BY_HANDLE_FILE_INFORMATION info{};
+    if (!GetFileInformationByHandle(file_, &info) || (!info.nFileIndexHigh && !info.nFileIndexLow)) return {};
+    return std::to_wstring(info.dwVolumeSerialNumber) + L":" +
+        std::to_wstring(info.nFileIndexHigh) + L":" + std::to_wstring(info.nFileIndexLow);
+}
 FPDF_PAGE PdfDocument::loadPage(int index) {
     if (index < 0 || index >= count_) throw PdfError(L"Érvénytelen oldalszám.");
     auto page = api_.FPDF_LoadPage(document_, index);

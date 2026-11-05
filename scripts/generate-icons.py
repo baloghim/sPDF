@@ -15,6 +15,7 @@ NAMES = {
     "zoom-in": "actions", "zoom-out": "actions", "zoom-fit-best": "actions",
     "zoom-fit-width": "actions", "object-rotate-right": "actions",
     "application-pdf": "mimetypes",
+    "document-print": "devices", "edit-find": "actions",
 }
 with tarfile.open(ROOT / "KDE-Modern-Classic-20261027.tar.gz") as archive:
     for name, section in NAMES.items():

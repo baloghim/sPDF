@@ -65,7 +65,7 @@ def main():
                 for dependency in imports:
                     assert dependency in system or dependency in bundled, f"Unbundled DLL: {path}: {dependency}"
                 print(f"{path}: x64; imports {', '.join(imports)}")
-        assert "sPDF/spdf_pdf_tests.exe" not in entries
+        assert not any(PurePosixPath(x).name.endswith("_tests.exe") for x in entries), "Test executable in package"
         print(f"PASS: {len(entries)} ZIP entries, one sPDF folder, x64 binaries, dependency and license checks")
 
 

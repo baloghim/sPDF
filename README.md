@@ -2,67 +2,66 @@
 
 Könnyű, natív C++/Win32 PDF-megtekintő Windows x64 rendszerre. Magyar felület, PDFium motor, KDE Modern Classic ikonok; telepítés és .NET nélkül.
 
-**[Windows x64 fejlesztői előzetes letöltése – 0.1.0](https://github.com/baloghim/sPDF/releases/download/v0.1.0-preview/sPDF-0.1.0-preview-win-x64.zip)**
+**[Legfrissebb publikált Windows x64 kiadás letöltése – 0.1.0-preview](https://github.com/baloghim/sPDF/releases/download/v0.1.0-preview/sPDF-0.1.0-preview-win-x64.zip)**
 
-Ez az első működő fejlesztői változat, nem a teljes 1.0 alkalmazás. [Kiadási jegyzetek és ellenőrzőösszeg](https://github.com/baloghim/sPDF/releases/tag/v0.1.0-preview).
+A forráskód jelenleg a **0.2.0-preview** mérföldkövet tartalmazza: új, világos főablakot és több dokumentumot kezelő füleket. Az új kiadás a sikeres Windows-ellenőrzések után kerül publikálásra.
 
-**Minimum célrendszer: Windows 10 1607 (14393), x64.** A `v0.1.0-preview` kiadás működését a felhasználó a célrendszeren visszaigazolta (2026. november 5.). [Kompatibilitási feljegyzés](docs/PDFium.md#windows-10-1607).
+**Célrendszer: Windows 10 1607 (14393), x64.** A 0.1.0 kiadás célrendszeri működését a felhasználó visszaigazolta. A 0.2.0 külön célrendszeri tesztet igényel. [Kompatibilitási feljegyzés](docs/PDFium.md).
 
-## Letöltés és indítás
+## A 0.2.0 funkciói
 
-A [0.1.0 fejlesztői kiadás](https://github.com/baloghim/sPDF/releases/tag/v0.1.0-preview) ZIP-je a GitHub Actions natív Windows x64 MSVC Release buildjéből készült. A fordítás, a PDFium-integrációs tesztek, a főablak elsőoldal-megjelenítési próbája és a csomagellenőrzés sikeresen lefutott a publikálás előtt. [Ellenőrzött kiadási folyamat](https://github.com/baloghim/sPDF/actions/runs/42031609343).
+- Rendezett, világos Win32 főablak; magyar Fájl, Szerkesztés, Nézet, Oldalak, Eszközök és Súgó menü.
+- 24×24 pixeles, DPI szerint skálázott eredeti KDE Modern Classic ikonok; eszköztippek és aktív nézetállapotok.
+- Több PDF megnyitása fájlválasztóval, több fájl behúzásával vagy több parancssori argumentummal.
+- Fülek fájlnévvel, teljes útvonalat mutató eszköztippel, kijelölt állapottal és X bezárógombbal; sok fül esetén natív túlcsordulási vezérlő.
+- Fülenként megmaradó oldalszám, nagyítás/illesztés, ideiglenes forgatás és görgetési hely.
+- Ismételt megnyitáskor a meglévő fül aktiválása; a munkaszál fájlazonosító alapján is felismeri az azonos dokumentumot.
+- Egy hibás vagy megszakított jelszókérésű PDF megnyitása nem zárja be a többi dokumentumot.
+- Megmaradt PDFium-megjelenítés, lapozás, nagyítás, illesztés, görgetés, Unicode-fájlnév és jelszókérés.
+- Hat elkülönített állapotsormező: oldal, nagyítás, papírméret, fájlméret, nézet, műveleti állapot.
 
-A [Windows x64 preview workflow](https://github.com/baloghim/sPDF/actions/workflows/windows.yml) sikeres futása után a ZIP a futás **Artifacts** részéből is tölthető le. Manuálisan is indítható; a `main` ágat ellenőrzi, a `v0.1.0-preview` címke pedig sikeres ellenőrzések után fejlesztői kiadást publikál. Helyi fordításkor a csomag a `dist/sPDF-0.1.0-preview-win-x64.zip` fájl.
+A PDFiumot továbbra is **egyetlen munkaszál** használja. A háttérfülek nem renderelnek; fülváltáskor csak az aktív oldal bitképe készül újra. Az eredeti PDF-ek kizárólag olvasásra nyílnak meg. A megjelenítési forgatás nem szerkeszti a dokumentumot.
 
-Bontsa ki a ZIP-et, majd a benne lévő `sPDF` mappában indítsa az `sPDF.exe` fájlt. Az EXE és a `pdfium.dll` maradjon ugyanabban a mappában. Nincs telepítő vagy rendszergazdai jogosultságigény. A program nem végez telemetriát és futás közben nem tölt le függőségeket.
+**Még nem működő, letiltott vezérlők:** keresőmező, nyomtatás, Folyamatos és Oldalrendező nézet; szerkesztés, PDF-export és beállítások. A teljes 1.0 fejlesztése folytatódik a [specifikáció](docs/SPECIFICATION.md) szerint.
 
-## Elkészült funkciók
+![A tényleges 0.2.0 felület három PDF-füllel](docs/screenshots/preview-0.2.0-wine.png)
 
-- Egy PDF megnyitása fájlválasztóval, Ctrl+O-val, behúzással vagy parancssori fájlnévvel.
-- Unicode-fájlnevek; jelszóval védett PDF-ek jelszókérése.
-- Valódi, háttérszálon végzett PDFium-renderelés, igény szerint egy oldalról.
-- Előző/következő/első/utolsó oldal és közvetlen oldalszám.
-- Nagyítás, teljes oldal, oldalszélesség, 100% és görgetés.
-- Ideiglenes, csak megjelenítést érintő 90°-os forgatás.
-- Magyar menük, világos munkaterület, ikonos eszköztár, állapotsor, DPI-kezelés.
-- Hibás, hiányzó, üres és 4 GiB-nál nagyobb fájlok elutasítása.
+A kép a futó Win32 alkalmazás látható felületéről készült Wine/Xvfb alatt, mesterséges mintadokumentumokkal. A Windows címsorát a célrendszer rajzolja.
 
-Az eredeti PDF-et a program kizárólag olvasásra nyitja meg; nem ír és nem szerkeszt PDF-et. Egyszerre **egy dokumentumot** kezel. Új fájl sikeres megnyitása lecseréli az előzőt; hiba esetén megőrzi azt. Több behúzott/parancssori fájlból az elsőt nyitja meg.
+## Letöltés és használat
 
-![A tényleges Win32 alkalmazás PDF-megjelenítése Wine alatt](docs/screenshots/preview-wine.png)
-
-A képernyőkép a ténylegesen futó Windows EXE-ről, Wine és virtuális képernyő alatt készült; nem Windows 10 kompatibilitási bizonyíték.
-
-**Még nincs:** dokumentumfül, folyamatos nézet, Oldalrendező, szövegkereső felület, PDF-export, nyomtatás, INI-beállításmentés, hivatalos Release, mért célhardver-teljesítmény.
-
-## Billentyűparancsok
+A kiadási ZIP-et bontsa ki, és az `sPDF` mappában indítsa az `sPDF.exe` fájlt. A `pdfium.dll` maradjon az EXE mellett. Nincs telepítő, rendszergazdai jogosultságigény, telemetria vagy futás közbeni függőségletöltés.
 
 | Billentyű | Művelet |
 |---|---|
-| Ctrl+O / Ctrl+W | Megnyitás / dokumentum bezárása |
+| Ctrl+O | Egy vagy több PDF megnyitása |
+| Ctrl+W | Aktuális fül bezárása |
+| Ctrl+Tab / Ctrl+Shift+Tab | Következő / előző fül |
 | PgUp / PgDn | Előző / következő oldal |
 | Ctrl+Home / Ctrl+End | Első / utolsó oldal |
 | Ctrl++ / Ctrl+- / Ctrl+görgő | Nagyítás / kicsinyítés |
 | Enter az oldalszámmezőben | Ugrás az oldalra |
 | F1 / Alt+F4 | Billentyűparancsok / kilépés |
 
-## Fordítás Windows alatt
+## Fordítás és ellenőrzés Windows alatt
 
-Visual Studio 2022 C++ desktop eszközök, Windows SDK, CMake 3.24+, x64 cél szükséges. A Python 3 csak a ZIP ellenőrzéséhez kell. Az ikonok már generált erőforrásként is a repóban vannak.
+Visual Studio 2022 C++ desktop eszközök, Windows SDK, CMake 3.24+, x64 cél szükséges. A Python 3 csak a ZIP ellenőrzéséhez kell. Az ikonok generált erőforrásként a repóban vannak.
 
 ```powershell
 cmake -S . -B build -A x64 -DBUILD_TESTING=ON
 cmake --build build --config Release --parallel 2
 ctest --test-dir build -C Release --output-on-failure --no-tests=error
 cpack --config build/CPackConfig.cmake -C Release -B dist
-python scripts/check-package.py dist/sPDF-0.1.0-preview-win-x64.zip
+python scripts/check-package.py dist/sPDF-0.2.0-preview-win-x64.zip
 ```
 
-A CMake SHA-256 szerint ellenőrzi a rögzített Windows x64 PDFium archívumot. Offline: `-DSPDF_PDFIUM_ARCHIVE=C:/downloads/pdfium-win-x64.tgz`. Más verziót az ellenőrzés elutasít. A Visual C++ runtime statikusan kerül az EXE-be (`/MT`).
+A CMake HTTPS-en tölti le és SHA-256 szerint ellenőrzi a rögzített Windows x64 PDFium archívumot. Offline: `-DSPDF_PDFIUM_ARCHIVE=C:/downloads/pdfium-win-x64.tgz`. Más verziót az ellenőrzés elutasít. A Visual C++ runtime statikusan kerül az EXE-be (`/MT`).
+
+A [Windows x64 preview workflow](https://github.com/baloghim/sPDF/actions/workflows/windows.yml) a `main` ág és a pull requestek ellenőrzését végzi, manuálisan is indítható. A `v0.2.0-preview` címke sikeres fordítás és tesztek után fejlesztői kiadást publikál, ZIP-pel és ellenőrzőösszeggel. A fejlesztői artifactok a sikeres futások **Artifacts** részében is elérhetők.
 
 ## Keresztfordítás Linuxon
 
-Szükséges: MinGW-w64 x64 POSIX C++ fordító, windres, CMake és Ninja.
+MinGW-w64 x64 POSIX C++ fordító, windres, CMake és Ninja szükséges.
 
 ```sh
 cmake -S . -B build-mingw -G Ninja \
@@ -70,25 +69,25 @@ cmake -S . -B build-mingw -G Ninja \
   -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
 cmake --build build-mingw --parallel 2
 cpack --config build-mingw/CPackConfig.cmake -B dist
-python3 scripts/check-package.py dist/sPDF-0.1.0-preview-win-x64.zip
+python3 scripts/check-package.py dist/sPDF-0.2.0-preview-win-x64.zip
 ```
 
-A Windows teszt-EXE Windows vagy Wine futtatókörnyezetet igényel; keresztfordításkor a CTest nem futtatja automatikusan Linux programként. A MinGW-build statikusan linkeli a GCC, C++ és winpthread runtime részeit.
+A Windows tesztprogramok Windows vagy Wine környezetet igényelnek; a felületi teszthez grafikus munkamenet is szükséges. A MinGW-build a GCC, C++ és winpthread runtime részeit statikusan linkeli.
 
-## Architektúra és ellenőrzések
+## Architektúra és tesztek
 
-- `PdfiumLibrary`: az EXE melletti DLL biztonságos betöltése és C API.
-- `PdfDocument`: kizárólag olvasható Unicode-fájlelérés és dokumentumélettartam.
-- `PdfRenderer`: egyetlen PDFium-munkaszál, elavult renderelések megszakítása, korlátozott bitképméret.
-- `MainWindow`: natív ablak, vezérlők, események; nem hív PDFiumot a felületi szálon.
-- `tests`: tényleges Windows PDFium integráció, mesterséges, nem bizalmas PDF-ekkel.
+- `TabManager` és `DocumentState`: stabil dokumentumazonosítók, fülválasztás és önálló nézetállapotok.
+- `PdfDocument` és `PdfiumLibrary`: változatlan, kizárólag olvasható PDFium C API alap.
+- `PdfRenderer`: dokumentumtérkép a munkaszálon; sorban tartott megnyitások/bezárások, eldobható aktív renderkérések.
+- `DocumentTabBar`: natív tab control bevitel, billentyűzet és túlcsordulás, világos egyedi kirajzolással.
+- `MainWindow`: megjelenítés és események, a `spdf_ui` könyvtárban; a PDFiumot nem hívja a felületi szálon.
 
-Nincs lemezes rendergyorsítótár vagy automatikusan mentett dokumentumelőzmény. Egy renderbitkép legfeljebb 48 MiB; másolásakor és az előző oldal megőrzésekor további bitképmemória szükséges. Ez nem a teljes processz memóriahasználatának korlátja.
+Nincs lemezes rendergyorsítótár vagy automatikusan eltárolt dokumentumelőzmény. Fülenként csak a dokumentum és a kis nézetállapot marad meg; a teljes felbontású képet csak az aktív fülhöz tartjuk fenn. Egy renderbitkép legfeljebb 48 MiB, ami nem a teljes folyamat memóriakorlátja.
 
-[Tesztjelentés és nyitott feladatok](docs/DEVELOPMENT.md) · [PDFium verzió és kompatibilitás](docs/PDFium.md) · [Teljes 1.0 specifikáció](docs/SPECIFICATION.md)
+A tesztek valódi PDFium-renderelést, több dokumentum élettartamát, fülváltást, képpontosan visszaálló görgetést, X-es bezárást, hibás és titkosított fájlokat ellenőriznek. [Fejlesztési és tesztjelentés](docs/DEVELOPMENT.md) · [0.2.0 feladat](docs/REQUEST-0.2.0.md).
 
 ## Licencek
 
-A PDFium teljes szállítói licenccsomagja a ZIP `licenses/pdfium/LICENSE` fájlja. A KDE Modern Classic ikonok LGPL-3.0-or-later licencűek; eredeti SVG-forrásuk és a szükséges szerzői/licencfájlok a csomag részei. A régi KDE Classic külön engedélyszövegét is megőrizzük. A MinGW-build GCC runtime kivételét és engedélyeit mellékeljük. Az alkalmazáskódhoz a tulajdonos még nem választott külön projektlicencet.
+A PDFium teljes szállítói licenccsomagja a ZIP `licenses/pdfium/LICENSE` fájlja. A KDE Modern Classic ikonok LGPL-3.0-or-later licencűek; eredeti SVG-forrásuk és a szükséges szerzői/licencfájlok a csomag részei. A régi KDE Classic engedélyszövegét és a MinGW runtime licenceit is megőrizzük. Az alkalmazáskódhoz külön projektlicenc még nincs megadva.
 
-Ikonok újragenerálása: `python scripts/generate-icons.py` (CairoSVG 2.8.2 és Pillow). A ZIP csak a használt kilenc ikont tartalmazza.
+Ikonok újragenerálása: `python scripts/generate-icons.py` (CairoSVG 2.8.2 és Pillow). A csomag a használt tizenegy ikont tartalmazza.

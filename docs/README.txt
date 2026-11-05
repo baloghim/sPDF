@@ -1,24 +1,27 @@
-sPDF Megtekintő – 0.1.0 fejlesztői előzetes
+sPDF Megtekintő – 0.2.0 fejlesztői előzetes
 ========================================
 
-Bontsa ki a teljes sPDF mappát, majd indítsa az sPDF.exe fájlt.
+Bontsa ki az sPDF mappát, és indítsa az sPDF.exe fájlt.
 A pdfium.dll maradjon az EXE mellett. Telepítés és .NET nem szükséges.
 
-Megnyitás: Ctrl+O, Fájl menü, behúzás vagy parancssori fájlnév.
-Lapozás: PgUp/PgDn; az oldalszámmezőben Enter.
-Nagyítás: Ctrl+görgő. Az eszköztár további nézetműveleteket tartalmaz.
-A forgatás csak a megjelenítést érinti, az eredeti PDF nem módosul.
+Ctrl+O: PDF-ek megnyitása. Több fájl egyszerre is kijelölhető vagy behúzható.
+Minden dokumentum külön fülön nyílik meg; ismételt megnyitáskor a már
+megnyitott fül aktiválódik. Fülenként megmarad az oldal, nagyítás,
+illesztés, ideiglenes forgatás és görgetési pozíció.
 
-Egyszerre egy PDF nyitható meg. Ez a változat nem szerkeszt, nem exportál
-és nem nyomtat; még nem a teljes 1.0 verzió.
+Ctrl+Tab / Ctrl+Shift+Tab: fülváltás. Ctrl+W vagy a fül X gombja: bezárás.
+PgUp/PgDn: lapozás. Az oldalszámmezőben Enter: ugrás.
+Ctrl+görgő: nagyítás. Az eredeti PDF nem módosul.
 
-Célrendszer: Windows 10 1607 vagy újabb, x64.
-A v0.1.0-preview kiadás működését a felhasználó a Windows 10 1607
-célrendszeren visszaigazolta (2026. november 5.).
+A keresés, nyomtatás, Folyamatos nézet és Oldalrendező még letiltott.
+Ez a változat nem szerkeszt és nem exportál; még nem a teljes 1.0.
 
-Licencek: licenses mappa. Használt ikonok SVG-forrásai: resources/icons.
+Cél: Windows 10 1607 x64 vagy újabb. A 0.1.0 kiadás működését a felhasználó
+visszaigazolta a célrendszeren; a 0.2.0 külön célrendszeri próbát igényel.
+
+Licencek: licenses mappa. Ikonok SVG-forrásai: resources/icons.
 PDFium verzió és eredet: licenses/pdfium/PDFium.md.
-A program nem végez telemetriát.
+Nincs telemetria vagy automatikusan mentett dokumentumelőzmény.
 
-Projekt: https://github.com/baloghim/sPDF
+https://github.com/baloghim/sPDF
 www.edutech.hu

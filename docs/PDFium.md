@@ -19,8 +19,12 @@ A visszaigazolás a GitHubon publikált MSVC x64 kiadásra vonatkozik, a mellék
 
 A szállítói csomag továbbra sem tartalmaz külön Windows 10 1607 garanciát. A célrendszeri visszaigazolás az adott alkalmazáskiadásra érvényes; későbbi PDFium- vagy fordítóverzió cseréjénél a kompatibilitást újra ellenőrizni kell.
 
-Az alkalmazás `_WIN32_WINNT=0x0A00`, `WINVER=0x0A00`, x64 és `asInvoker` beállítással készül. A manifest újabb DPI-viselkedést és PerMonitor visszaesést deklarál; közvetlenül nem hívunk újabb DPI API-t, például `GetDpiForWindow`-t. Az EXE melletti DLL abszolút útvonalról, korlátozott függőségkereséssel töltődik be.
+Az alkalmazás `_WIN32_WINNT=0x0A00`, `WINVER=0x0A00`, x64 és `asInvoker` beállítással készül. A manifest újabb DPI-viselkedést és PerMonitor visszaesést deklarál; a kezdeti monitor-DPI-hez a `GetDpiForWindow` opcionális, futáskor feloldott függvényét használjuk, hiányában `GetDeviceCaps` visszaeséssel. Nincs új, kötelező DPI API-import. Az EXE melletti DLL abszolút útvonalról, korlátozott függőségkereséssel töltődik be.
 
 A használt Win32 alap API-k elérhetők a célrendszeren. A ZIP-ellenőrzés x64 PE-képet és mellékelt DLL-eket ellenőriz; a célrendszeri működést a fenti felhasználói visszajelzés igazolja.
 
 A további kiadások célrendszeri ellenőrzéseihez: indítás, szöveges/szkennelt/titkosított PDF, Unicode-fájlnév, lapozás, renderelés, több DPI-beállítás és az importkészlet. Az indulási idő és memóriahasználat mérését külön kell dokumentálni; ilyen méréseket a mostani visszajelzés nem tartalmaz.
+
+## 0.2.0-preview állapot
+
+A PDFium verziója és SHA-256 azonosítója változatlan. A 0.1.0-ra kapott felhasználói visszaigazolás megmarad; a 0.2.0 új felületének és többfüles működésének Windows 10 1607 célrendszeri próbája külön szükséges. A build- és integrációs tesztek ezt nem helyettesítik.

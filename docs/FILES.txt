@@ -1,10 +1,11 @@
-Új fájlok (a generált build- és dist-könyvtárak nélkül):
+A projekt forrás-, erőforrás- és dokumentációs fájljai (generált build/dist nélkül):
 
 .gitattributes
 .github/workflows/release-notes.yml
 .github/workflows/windows.yml
 .gitignore
 CMakeLists.txt
+KDE-Modern-Classic-20261027.tar.gz
 LICENSES/KDE-Modern-Classic/AUTHORS
 LICENSES/KDE-Modern-Classic/COPYING
 LICENSES/KDE-Modern-Classic/COPYING.LESSER
@@ -14,25 +15,37 @@ LICENSES/MinGW-runtime/GCC-copyright.txt
 LICENSES/MinGW-runtime/GPL-3.txt
 LICENSES/MinGW-runtime/MinGW-copyright.txt
 LICENSES/NOTICE.txt
+README.md
 cmake/Pdfium.cmake
 cmake/mingw-x64.cmake
+docs/DEVELOPMENT-0.1.0.md
 docs/DEVELOPMENT.md
 docs/FILES.txt
 docs/PDFium.md
 docs/README.txt
 docs/RELEASE-0.1.0.md
+docs/RELEASE-0.2.0.md
+docs/REQUEST-0.2.0.md
 docs/SPECIFICATION.md
+docs/screenshots/preview-0.2.0-wine.png
 docs/screenshots/preview-wine.png
+include/DocumentState.h
+include/DocumentTabBar.h
 include/MainWindow.h
 include/PdfDocument.h
 include/PdfRenderer.h
 include/PdfiumLibrary.h
+include/TabManager.h
 resources/app.manifest
 resources/app.rc
 resources/icons/application-pdf.ico
 resources/icons/application-pdf.svg
 resources/icons/document-open.ico
 resources/icons/document-open.svg
+resources/icons/document-print.ico
+resources/icons/document-print.svg
+resources/icons/edit-find.ico
+resources/icons/edit-find.svg
 resources/icons/go-next.ico
 resources/icons/go-next.svg
 resources/icons/go-previous.ico
@@ -50,15 +63,16 @@ resources/icons/zoom-out.svg
 resources/resource.h
 scripts/check-package.py
 scripts/generate-icons.py
+src/DocumentTabBar.cpp
 src/MainWindow.cpp
 src/PdfDocument.cpp
 src/PdfRenderer.cpp
 src/PdfiumLibrary.cpp
+src/TabManager.cpp
 src/main.cpp
 tests/PdfIntegrationTests.cpp
+tests/TabIntegrationTests.cpp
+tests/WindowIntegrationTests.cpp
 tests/fixtures/broken.pdf
 tests/fixtures/encrypted.pdf
 tests/fixtures/sample.pdf
-
-Módosított meglévő fájl: README.md
-Változatlan: KDE-Modern-Classic-20261027.tar.gz

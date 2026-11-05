@@ -42,6 +42,10 @@ int main(int argc, char** argv) {
             require(first.width == 200 && first.height == 300, "100% point scale renders expected size");
             const size_t center = (static_cast<size_t>(150) * first.width + 100) * 4;
             require(first.pixels[center + 2] > 200 && first.pixels[center] < 50, "first page really rendered red content");
+            request.deviceScale = 1.5;
+            auto scaled = spdf::renderPage(doc, request, [] { return false; });
+            require(scaled.width == 300 && scaled.height == 450 && scaled.zoom == request.zoom, "150 percent DPI scales pixels while preserving logical zoom");
+            request.deviceScale = 1;
             request.page = 1;
             auto second = spdf::renderPage(doc, request, [] { return false; });
             require(second.pixels[center] > 200 && second.pixels[center + 2] < 50, "second page really rendered blue content");

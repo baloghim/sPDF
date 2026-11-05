@@ -1,66 +1,52 @@
-# 0.1.0 fejlesztői előzetes – jelentés
+# 0.2.0-preview – fejlesztési és tesztjelentés
 
-2026. november 5. Az 1.0 specifikáció első technológiai alapja működik, a `v0.1.0-preview` kiadás cél-Windows alatti működését a felhasználó visszaigazolta. Az 1.0 teljes funkcionalitása még fejlesztés alatt áll.
+2026. november 5. A meglévő Win32/PDFium alapra épült tovább a program; a dokumentumolvasó, a PDFium C API és a renderelési műveletek megmaradtak. Az új mérföldkő a főablakot és a többfüles dokumentumkezelést valósítja meg. A teljes 1.0 követelményei a `SPECIFICATION.md`, a mostani feladat a `REQUEST-0.2.0.md` fájlban olvashatók.
 
-## Előállított helyi MinGW-csomag
+## Elkészült
 
-`dist/sPDF-0.1.0-preview-win-x64.zip`, 3 927 872 bájt. Egyetlen felső szintű `sPDF` mappa, benne `sPDF.exe`, `pdfium.dll`, `README.txt`, licencek és a használt ikonok forrásai. Telepítő, .NET vagy külön GCC runtime DLL nincs benne és nem szükséges. SHA-256:
+- Világos, átméretezhető főablak: menüsor, jobb oldali letiltott keresőmező, csoportosított eszköztár, fülsor, szükség esetén külön nézetvezérlősor, dokumentumterület és állandó állapotsor.
+- Az eredeti KDE készletből 11 ténylegesen használt ikon, köztük a nyomtató és a keresés. Az eszköztári képek 24×24 pixelesek 96 DPI-n, más DPI-n arányosan skálázódnak.
+- Több fájl megnyitása fájlválasztóból, behúzással és parancssorból. A már megnyitott útvonal aktiválja a meglévő fület; a worker fájlazonosító alapján is deduplikál.
+- X-es bezárás, Ctrl+W, Ctrl+Tab / Ctrl+Shift+Tab, rövidített fájlnevek, teljes útvonalas eszköztipp, aktív fül kék jelölése; a natív tab control túlcsordulási és billentyűzetkezelése.
+- Önálló dokumentumállapot: oldal, zoom, illesztési mód, megjelenítési forgatás, vízszintes/függőleges görgetési pozíció.
+- Hat külön állapotsormező: oldal, nagyítás, papírméret, fájlméret, nézet, aktuális állapot.
+- A hibás fájl és a jelszó megszakítása csak az érintett új fület zárja; a többi dokumentum nyitva marad.
+- Névjegy 0.2.0 verzióval, magyar leírással, kattintható edutech.hu és licenchivatkozással.
 
-```text
-10272a9cb9d4e428f4d9fa2829536824b68a6703c3e8df4bc3a1952b0ec97e08
-```
+A keresés, nyomtatás, Folyamatos és Oldalrendező nézet, szerkesztés, export és beállításmentés letiltott előkészítés. Ezeket nem jelöljük működő funkciónak. A teljes 1.0 megvalósítása továbbra is nyitott.
 
-Ez a korábbi helyi MinGW keresztfordítás csomagja. A később publikált GitHub-kiadás natív MSVC buildből készült, ezért a két ZIP mérete és ellenőrzőösszege eltér.
+## Architektúra és erőforrások
 
-## GitHubon publikált Windows-kiadás
+A `TabManager`/`DocumentState` modell nem tartalmaz ablakvezérlőket vagy PDFium-handle-öket. A `DocumentTabBar` a natív tab control könnyű megjelenítési rétege; a `MainWindow` a `spdf_ui` könyvtárban maradt, így a teszt ugyanazt a felületkódot használja.
 
-A [v0.1.0-preview fejlesztői kiadás](https://github.com/baloghim/sPDF/releases/tag/v0.1.0-preview) elérhető. A [Windows x64 ZIP](https://github.com/baloghim/sPDF/releases/download/v0.1.0-preview/sPDF-0.1.0-preview-win-x64.zip) **3 712 618 bájt**; SHA-256:
+Minden PDFium-művelet egyetlen worker szálon történik, az inicializálástól a dokumentumok és a könyvtár lezárásáig. A worker dokumentumtérképet és külön vezérlőkérés-sort tart fenn: a megnyitás és a bezárás nem veszhet el renderkérések összevonása miatt. Fülváltáskor az előző render megszakad/eldobódik; az inaktív fül renderkérését a worker elutasítja. A háttérben megnyitott dokumentumhoz csak metaadatot tölt, bitképet nem készít.
 
-```text
-12813a5b1f36ee5fd958ebc839e7bc3be6a4d0bae4b07c0121ca64294398457f
-```
+A felület csak az aktív nézet teljes felbontású bitképét tartja. Nincs lemezes rendercache, PDF-tartalom vagy előzmény automatikus mentése. A 48 MiB bitképkorlát megmaradt; ez nem a teljes folyamat memóriahatára. Teljesítmény- és RAM-mérést nem helyettesít ez a tervezési korlát.
 
-A [42031609343 számú GitHub Actions futás](https://github.com/baloghim/sPDF/actions/runs/42031609343) Windows Server 2022 runneren, MSVC x64 Release konfigurációban sikeres fordítást, PDFium-integrációs tesztet, főablak-megjelenítési próbát, ZIP- és függőségellenőrzést végzett. Csak ezek után publikálta a fejlesztői kiadást és a ZIP-et az ellenőrzőösszegével. A kiadási címke a `0f8808847232efeb65364e144eb1ce0bb2b43dbc` forráscommitot jelöli.
+## Végrehajtott helyi ellenőrzések
 
-A GitHubról visszatöltött ZIP SHA-256 ellenőrzése és a `check-package.py` vizsgálata is sikeres. A csomag 39 bejegyzést tartalmaz, az EXE és a PDFium x64 architektúrájú, közvetlenül csak Windows rendszer-DLL-eket importál.
+MinGW-w64 x64 Release fordítás: sikeres. CMake/CTest, Wine 10.0 és Xvfb alatt **3 tesztcsomag, összesen 66 sikeres ellenőrzés**, 0 hiba, 0 kihagyott teszt:
 
-## Célrendszeri visszaigazolás
+- `pdfium_integration`: **22 ellenőrzés**, beleértve a tényleges színes képtartalmat, szövegréteget, jelszót, Unicode-útvonalat, eredeti fájl változatlanságát és 150%-os DPI melletti pixelskálázást.
+- `document_tabs`: **27 ellenőrzés**; stabil azonosítók, állapotmegőrzés, duplikáció, fülbezárás, két PDFium-dokumentum, inaktív render tiltása, hibás dokumentum elkülönítése és gyors egymás utáni nyitás/bezárás.
+- `window_tabs`: **17 ellenőrzés** a valódi megosztott Win32 felületen, külön GUI-szálon. Valódi fülkattintás, X és Ctrl+W, hat státuszmező, 1366×768 és szűk ablak, nagyított oldal görgetése, visszaálló képtartalom képpontos összehasonlítása, hibás és jelszavas PDF párbeszéde.
 
-2026. november 5-én a felhasználó a publikált `v0.1.0-preview` kiadás működését a Windows 10 1607 célrendszeren visszaigazolta: „A kompatibilitás pipa, a kiadás működik a célrendszeren.” A visszajelzés a fenti SHA-256 azonosítójú GitHub-kiadáshoz tartozik. Részletes funkciólista és teljesítménymérés nem szerepelt benne. Lásd `PDFium.md`.
+A Win32 felület tesztje ugyanabban a tesztfolyamatban futtatja a megosztott ablakmodult, mert a Wine folyamatközi `WM_PRINT`/GDI támogatása korlátozott. A fő EXE-t külön `--smoke-test` is ellenőrzi; a kibontott ZIP-ből két Unicode-nevű PDF megnyitása és megjelenítése sikeres, kilépési kód 0.
 
-## Végrehajtott ellenőrzések
+A helyi `sPDF-0.2.0-preview-win-x64.zip` CPack-csomag egyetlen `sPDF` mappát és 43 bejegyzést tartalmaz. ZIP CRC, x64 PE, EXE/DLL-függőségek, szükséges licencek és a tesztprogramok kizárása: sikeres. Nincs külön GCC vagy VC runtime DLL a csomagban.
 
-- Tiszta Release keresztfordítás a repó `cmake/mingw-x64.cmake` toolchainjével: **sikeres**, x64 PE EXE és erőforrások; CMake 3.31.6, Ninja, Debian MinGW-w64 GCC 14 POSIX.
-- A PDFium CMake-en keresztüli HTTPS-letöltése, TLS- és rögzített SHA-256 ellenőrzése: **sikeres**.
-- A Windows teszt-EXE a mellékelt Windows PDFium DLL-lel, Wine 10.0 alatt: **21 ellenőrzés sikeres, 0 hiba**, kilépési kód 0.
-- A tényleges Win32 főablak `--smoke-test` próbája: **sikeres**; megnyitotta, háttérszálon renderelte és a dokumentumterületen kirajzolta a PDF első oldalát, majd kilépett 0 kóddal.
-- A ZIP kibontott példányából indított `sPDF.exe` megjelenítési próbája: **sikeres**, kilépési kód 0.
-- ZIP CRC, egyetlen `sPDF` gyökérmappa, szükséges állományok/licencek, EXE és DLL x64 architektúra, közvetlen DLL-függőségek: **sikeres**, 39 archívumbejegyzés. Az EXE csak rendszer-DLL-eket importál; a PDFiumot futáskor az EXE mellől tölti be.
-- A futó alkalmazás tényleges képe: `docs/screenshots/preview-wine.png`.
+## Kijavított hibák
 
-A 21 integrációs ellenőrzés: háromoldalas PDF megnyitása; fájlhossz; szövegréteg; bitmapméret; az első oldal valódi piros és a második valódi kék képtartalma; forgatás; teljesoldal- és szélességillesztés; renderelés megszakítása; 48 MiB bitképkorlát; negatív és túlfutó oldalszám; eredeti fájl bájtonkénti változatlansága; sérült és hiányzó fájl; jelszókérés, hibás és helyes jelszó; Unicode/Hungarian fájlnév; különálló dokumentumkezelők.
+- A tab control natív elrendezési lépését megtartottuk az egyedi kirajzolás előtt; így a fülek és a túlcsordulási vezérlő helyzete helyes marad.
+- A natív toolbar címkézett és csak ikonos gombjainak szélessége külön beállítást kapott, így a szöveges Megnyitás gomb nem növeli meg az összes ikongombot.
+- A felületi teszt tényleges görgetési hibát talált: fülváltáskor az újra megjelenő görgetősáv néhány pixellel csökkenthette a visszaállított pozíciót. A sávok láthatósága most a tárolt pozíció korlátozása előtt rendeződik. A javítást a kirajzolt oldal képpontos visszaállítási tesztje ellenőrzi.
 
-## Javított hibák
+## Képernyőkép
 
-- A helyileg áthelyezett MinGW toolchain windres előfeldolgozóját explicit beállítottuk, így a Windows fejléceket használja.
-- A Windows `LONG` és C++ `int` közötti eltérést a felületi elrendezésben javítottuk.
-- A teszt tényleges futása során talált lebegőpontos illesztési kerekítést javítottuk: például a 200 × 2,3 eredménye nem veszít el egy pixelt.
+`docs/screenshots/preview-0.2.0-wine.png`: a tényleges alkalmazás három PDF-füllel, a virtuális képernyőn látható felületről készített képernyőkép. A bemutató PDF-ek mesterségesek és nem tartalmaznak személyes adatot. Ez nem látványterv és nem Windows 10 1607 futtatási bizonyíték.
 
-## Működő felület
+## Kiadás és fennmaradó ellenőrzések
 
-Magyar menük, világos Win32 főablak, valódi KDE ikonok, oldalszámmező és állapotsor. Egy PDF nyitható meg párbeszédablakból, behúzással vagy parancssorból. Lapozás, nagyítás, illesztés, görgetés és ideiglenes forgatás működik. A PDFium egyetlen háttérszálra korlátozott; az elavult renderelések megszakíthatók/eldobódnak. Az eredeti dokumentum írására nincs kódút.
+A `.github/workflows/windows.yml` a 0.2.0 verziót konfigurálja: natív MSVC x64 Release build, mindhárom CTest-csomag, fő EXE megjelenítési próba, csomag-/DLL-ellenőrzés, majd artifact és a `v0.2.0-preview` címkén fejlesztői Release. A natív szerveroldali eredmény a sikeres futás után kerül ide.
 
-A mesterséges teszt-PDF-ek ReportLab és pypdf használatával készültek; nincs bennük személyes adat. A `sample.pdf` három, eltérő színű és feliratú oldal; az `encrypted.pdf` ennek RC4-128 jelszavas változata (`spdf-test`); a `broken.pdf` szándékosan nem PDF.
-
-## Nyitott és nem végrehajtott ellenőrzések
-
-- A natív MSVC fordítás és tesztek GitHub Actions Windows Server 2022 runneren sikeresek; a Windows 10 1607 célrendszeri működés felhasználói visszaigazolása is megtörtént. A részletes célrendszeri funkciómátrix még nincs dokumentálva.
-- Fizikai nyomtató, HDD-s célhardver-teljesítmény, indulási idő és teljes processzmemória nincs tesztelve/mérve. A jelenlegi változat nem tartalmaz nyomtatási funkciót.
-- A jelszókérő párbeszéd UI-kezelése, a többmonitoros DPI-váltás és a nagy valós dokumentumkészlet manuális Windows-próbája nyitott. A titkosított PDF motoroldali megnyitása tesztelt.
-- A rögzített PDFium történeti alapverzió; stabil kiadás előtt frissítési és biztonsági felülvizsgálat szükséges.
-
-## Következő funkcionális mérföldkövek
-
-Dokumentumfülek és közös munkaváltozat, folyamatos nézet, keresés, INI-beállítások; majd Oldalrendező stabil oldalazonosítóval, visszavonás/újra, minőségmegőrző PDF-export és saját nyomtatási felület. Végül célhardvermérés, az új kiadások Windows 10 1607 regressziós próbája és hivatalos 1.0 kiadás. A jelenlegi kiadás a még hiányzó funkciókat nem tünteti fel elkészültként.
-
-A létrehozott fájlok teljes felsorolása: `FILES.txt`. A korábbi README tartalmát kibővítettük, az eredeti ikontéma-archívumot változatlanul megtartottuk.
+A 0.1.0 Windows 10 1607 célrendszeri működését a felhasználó már visszaigazolta; ez a feljegyzés megmaradt a `PDFium.md` és `DEVELOPMENT-0.1.0.md` fájlokban. A 0.2.0 külön célrendszeri tesztet igényel. A 150%-os bitmapteszt nem helyettesíti a többmonitoros, fizikai DPI-váltás tesztjét. HDD-s indulási idő és RAM-mérés, nyomtatóintegráció, keresés, folyamatos nézet, Oldalrendező és PDF-export későbbi mérföldkő.

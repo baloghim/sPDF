@@ -3,21 +3,20 @@
 #include <shellapi.h>
 
 int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int show) {
-    INITCOMMONCONTROLSEX controls{sizeof(controls), ICC_BAR_CLASSES | ICC_STANDARD_CLASSES};
+    INITCOMMONCONTROLSEX controls{sizeof(controls), ICC_BAR_CLASSES | ICC_STANDARD_CLASSES | ICC_TAB_CLASSES};
     InitCommonControlsEx(&controls);
     int argc = 0;
     LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-    std::wstring path;
+    std::vector<std::wstring> paths;
     bool smoke = false;
     if (argv && argc > 1) {
         smoke = std::wstring(argv[1]) == L"--smoke-test";
-        if (smoke && argc > 2) path = argv[2];
-        else if (!smoke) path = argv[1];
+        for (int i = smoke ? 2 : 1; i < argc; ++i) paths.emplace_back(argv[i]);
     }
     if (argv) LocalFree(argv);
     try {
         spdf::MainWindow window(instance);
-        if (!window.create(show, path, smoke)) return 1;
+        if (!window.create(show, paths, smoke)) return 1;
         const HACCEL accelerators = LoadAcceleratorsW(instance, MAKEINTRESOURCEW(IDR_ACCELERATORS));
         MSG message{};
         int result;

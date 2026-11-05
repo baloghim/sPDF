@@ -11,17 +11,33 @@ IDI_ZOOMOUT ICON "icons/zoom-out.ico"
 IDI_FITPAGE ICON "icons/zoom-fit-best.ico"
 IDI_FITWIDTH ICON "icons/zoom-fit-width.ico"
 IDI_ROTATE ICON "icons/object-rotate-right.ico"
+IDI_PRINT ICON "icons/document-print.ico"
+IDI_SEARCH ICON "icons/edit-find.ico"
 IDR_MENU MENU
 BEGIN
   POPUP "&Fájl"
   BEGIN
     MENUITEM "&Megnyitás…\tCtrl+O", IDM_OPEN
-    MENUITEM "Dokumentum &bezárása\tCtrl+W", IDM_CLOSE
+    MENUITEM "&Nyomtatás…", IDM_PRINT, GRAYED
+    MENUITEM "Oldalak mentése PDF-be…", IDM_EXPORT, GRAYED
+    MENUITEM "Mentés másként…", IDM_SAVEAS, GRAYED
+    MENUITEM SEPARATOR
+    MENUITEM "Aktuális fül &bezárása\tCtrl+W", IDM_CLOSE
     MENUITEM SEPARATOR
     MENUITEM "&Kilépés\tAlt+F4", IDM_EXIT
   END
+  POPUP "&Szerkesztés"
+  BEGIN
+    MENUITEM "Visszavonás\tCtrl+Z", IDM_UNDO, GRAYED
+    MENUITEM "Újra\tCtrl+Y", IDM_REDO, GRAYED
+    MENUITEM "Összes kijelölése\tCtrl+A", IDM_SELECTALL, GRAYED
+  END
   POPUP "&Nézet"
   BEGIN
+    MENUITEM "Egy oldal", IDM_SINGLE, CHECKED
+    MENUITEM "Folyamatos", IDM_CONTINUOUS, GRAYED
+    MENUITEM "Oldalrendező", IDM_ORGANIZER, GRAYED
+    MENUITEM SEPARATOR
     MENUITEM "&Előző oldal\tPgUp", IDM_PREVIOUS
     MENUITEM "&Következő oldal\tPgDn", IDM_NEXT
     MENUITEM "Első oldal\tCtrl+Home", IDM_FIRST
@@ -34,6 +50,16 @@ BEGIN
     MENUITEM "100%", IDM_ACTUALSIZE
     MENUITEM "Forgatás jobbra (csak megjelenítés)", IDM_ROTATE
   END
+  POPUP "&Oldalak"
+  BEGIN
+    MENUITEM "Kijelölt oldalak törlése", IDM_DELETE, GRAYED
+    MENUITEM "Törölt oldalak visszaállítása", IDM_RESTORE, GRAYED
+  END
+  POPUP "&Eszközök"
+  BEGIN
+    MENUITEM "Keresés\tCtrl+F", IDM_SEARCH, GRAYED
+    MENUITEM "Beállítások…", IDM_SETTINGS, GRAYED
+  END
   POPUP "&Súgó"
   BEGIN
     MENUITEM "Billentyűparancsok", IDM_SHORTCUTS
@@ -45,6 +71,8 @@ IDR_ACCELERATORS ACCELERATORS
 BEGIN
   "O", IDM_OPEN, VIRTKEY, CONTROL
   "W", IDM_CLOSE, VIRTKEY, CONTROL
+  VK_TAB, IDM_NEXTTAB, VIRTKEY, CONTROL
+  VK_TAB, IDM_PREVIOUSTAB, VIRTKEY, CONTROL, SHIFT
   VK_PRIOR, IDM_PREVIOUS, VIRTKEY
   VK_NEXT, IDM_NEXT, VIRTKEY
   VK_HOME, IDM_FIRST, VIRTKEY, CONTROL
@@ -66,8 +94,8 @@ BEGIN
   PUSHBUTTON "Mégse", IDCANCEL, 195, 70, 62, 18
 END
 1 VERSIONINFO
-FILEVERSION 0,1,0,0
-PRODUCTVERSION 0,1,0,0
+FILEVERSION 0,2,0,0
+PRODUCTVERSION 0,2,0,0
 FILEFLAGSMASK 0x3fL
 FILEFLAGS VS_FF_PRERELEASE
 FILEOS VOS_NT_WINDOWS32
@@ -78,9 +106,9 @@ BEGIN
     BLOCK "040e04b0"
     BEGIN
       VALUE "FileDescription", "sPDF Megtekintő"
-      VALUE "FileVersion", "0.1.0-preview"
+      VALUE "FileVersion", "0.2.0-preview"
       VALUE "ProductName", "sPDF Megtekintő"
-      VALUE "ProductVersion", "0.1.0-preview"
+      VALUE "ProductVersion", "0.2.0-preview"
       VALUE "OriginalFilename", "sPDF.exe"
     END
   END

@@ -20,6 +20,7 @@ public:
     PdfDocument& operator=(const PdfDocument&) = delete;
     int pageCount() const { return count_; }
     std::uint64_t byteSize() const { return access_.m_FileLen; }
+    std::wstring identity() const;
     FPDF_PAGE loadPage(int index);
     PdfiumLibrary& api() { return api_; }
 private:
