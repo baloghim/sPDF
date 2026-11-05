@@ -2,9 +2,9 @@
 
 Könnyű, natív C++/Win32 PDF-megtekintő Windows x64 rendszerre. Magyar felület, PDFium motor, KDE Modern Classic ikonok; telepítés és .NET nélkül.
 
-**[Legfrissebb publikált Windows x64 kiadás letöltése – 0.1.0-preview](https://github.com/baloghim/sPDF/releases/download/v0.1.0-preview/sPDF-0.1.0-preview-win-x64.zip)**
+**[Legfrissebb Windows x64 kiadás letöltése – 0.2.0-preview](https://github.com/baloghim/sPDF/releases/download/v0.2.0-preview/sPDF-0.2.0-preview-win-x64.zip)**
 
-A forráskód jelenleg a **0.2.0-preview** mérföldkövet tartalmazza: új, világos főablakot és több dokumentumot kezelő füleket. Az új kiadás a sikeres Windows-ellenőrzések után kerül publikálásra.
+A **[0.2.0-preview kiadás](https://github.com/baloghim/sPDF/releases/tag/v0.2.0-preview)** új, világos főablakot és több dokumentumot kezelő füleket tartalmaz. A natív Windows x64 MSVC build és mindhárom tesztcsomag sikeres; a ZIP-et csak ezek után publikálta az [ellenőrzött kiadási folyamat](https://github.com/baloghim/sPDF/actions/runs/42048716251).
 
 **Célrendszer: Windows 10 1607 (14393), x64.** A 0.1.0 kiadás célrendszeri működését a felhasználó visszaigazolta. A 0.2.0 külön célrendszeri tesztet igényel. [Kompatibilitási feljegyzés](docs/PDFium.md).
 

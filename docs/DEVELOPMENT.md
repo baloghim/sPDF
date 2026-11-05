@@ -50,6 +50,14 @@ A helyi `sPDF-0.2.0-preview-win-x64.zip` CPack-csomag egyetlen `sPDF` mappát é
 
 ## Kiadás és fennmaradó ellenőrzések
 
-A `.github/workflows/windows.yml` a 0.2.0 verziót konfigurálja: natív MSVC x64 Release build, mindhárom CTest-csomag, fő EXE megjelenítési próba, csomag-/DLL-ellenőrzés, majd artifact és a `v0.2.0-preview` címkén fejlesztői Release. A natív szerveroldali eredmény a sikeres futás után kerül ide.
+A [v0.2.0-preview kiadás](https://github.com/baloghim/sPDF/releases/tag/v0.2.0-preview) publikálva. A [42048716251 számú kiadási futás](https://github.com/baloghim/sPDF/actions/runs/42048716251) Windows Server 2022 runneren, natív MSVC x64 Release konfigurációban sikeresen végrehajtotta mindhárom CTest-csomagot (67 ellenőrzés), a fő EXE elsőoldal-megjelenítési próbáját, a CPack ZIP elkészítését és a DLL-/csomagellenőrzést. A kiadáspublikáló feladat is sikeres. Ugyanez a forrás előtte a [42048037322 számú főági futásban](https://github.com/baloghim/sPDF/actions/runs/42048037322) is sikeresen teljesítette a Windows-ellenőrzéseket.
+
+A publikált [sPDF-0.2.0-preview-win-x64.zip](https://github.com/baloghim/sPDF/releases/download/v0.2.0-preview/sPDF-0.2.0-preview-win-x64.zip) **3 962 063 bájt**, SHA-256:
+
+```text
+658dd72693c9a2c7ab766aa88ca2a54beb5dceb6d6e27dae2b934ed72e27b74e
+```
+
+A GitHubról visszatöltött ZIP ellenőrzőösszege egyezik a kiadáshoz csatolt `.sha256` fájllal; az archívum CRC-, x64 PE-, rendszer-DLL-, licenc- és mappaszerkezet-ellenőrzése ismét sikeres. A csomag 43 bejegyzést, egyetlen `sPDF` gyökérmappát tartalmaz. Forráscommit: `b5e9f3f2c07d3241a471d92b63d9867067bec50a`. A bináris kiadás előtti sikertelen címke állapotát a `v0.2.0-preview-ci-failed` címke megőrzi.
 
 A 0.1.0 Windows 10 1607 célrendszeri működését a felhasználó már visszaigazolta; ez a feljegyzés megmaradt a `PDFium.md` és `DEVELOPMENT-0.1.0.md` fájlokban. A 0.2.0 külön célrendszeri tesztet igényel. A 150%-os bitmapteszt nem helyettesíti a többmonitoros, fizikai DPI-váltás tesztjét. HDD-s indulási idő és RAM-mérés, nyomtatóintegráció, keresés, folyamatos nézet, Oldalrendező és PDF-export későbbi mérföldkő.
