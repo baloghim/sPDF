@@ -40,6 +40,7 @@ jobs:
           '```' | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           if ($env:TEST_OUTCOME -eq 'failure') {
             $report = Get-Content build/test-output.txt -Raw
+            if ($report.Length -gt 3000) { $report = $report.Substring($report.Length - 3000) }
             $escaped = $report.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
             Write-Output "::error title=Windows CTest report::$escaped"
           }

@@ -244,6 +244,9 @@ void MainWindow::showActive() {
     KillTimer(window_, ResizeTimer);
     renderer_->activate(tabs_.activeId()); displayed_ = RenderResult{};
     auto* tab = tabs_.active();
+    // Publish readiness only after the new bitmap arrives. Cross-thread window
+    // messages can observe controls while a tab switch is still being handled.
+    if (tab && !tab->opening) tab->rendering = true;
     scrollX_ = tab ? tab->scrollX : 0; scrollY_ = tab ? tab->scrollY : 0;
     tabBar_.update(tabs_); updateScrollbars(); updateControls();
     InvalidateRect(window_, nullptr, FALSE); InvalidateRect(canvas_, nullptr, FALSE);
@@ -317,6 +320,7 @@ void MainWindow::acceptResults() {
                 else { tabBar_.update(tabs_); updateControls(); }
                 continue;
             }
+            tab->rendering = tab->id == tabs_.activeId();
             tab->opening = false; tab->passwordPending = false; tab->pageCount = result.pageCount; tab->fileBytes = result.fileBytes;
             tabBar_.update(tabs_); updateControls();
             if (tab->id == tabs_.activeId()) requestRender();
