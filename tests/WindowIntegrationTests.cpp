@@ -97,36 +97,20 @@ struct WindowSession {
         SendMessageW(tabs(), WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(x, y));
         SendMessageW(tabs(), WM_LBUTTONUP, 0, MAKELPARAM(x, y));
     }
-    HWND dialog(bool password) {
-        struct Search { DWORD pid; bool password; HWND found; } search{GetCurrentProcessId(), password, nullptr};
+    HWND passwordDialog() {
+        struct Search { DWORD pid; HWND found; } search{GetCurrentProcessId(), nullptr};
         EnumWindows([](HWND hwnd, LPARAM context) -> BOOL {
             auto* s = reinterpret_cast<Search*>(context); DWORD pid = 0; GetWindowThreadProcessId(hwnd, &pid);
             wchar_t name[64]{}; GetClassNameW(hwnd, name, 64);
             const HWND confirm = GetDlgItem(hwnd, IDOK);
             const auto caption = text(hwnd);
-            const bool matching = s->password ? caption.find(L"Jelszóval védett PDF") != std::wstring::npos :
-                caption.find(L"Dokumentumhiba") != std::wstring::npos;
+            const bool matching = caption.find(L"Jelszóval védett PDF") != std::wstring::npos;
             if (pid == s->pid && std::wstring(name) == L"#32770" && matching && IsWindowVisible(hwnd) && IsWindowEnabled(hwnd) &&
                 confirm && IsWindowVisible(confirm) && IsWindowEnabled(confirm) &&
-                (!s->password || GetDlgItem(hwnd, IDC_PASSWORD))) { s->found = hwnd; return FALSE; }
+                GetDlgItem(hwnd, IDC_PASSWORD)) { s->found = hwnd; return FALSE; }
             return TRUE;
         }, reinterpret_cast<LPARAM>(&search));
         return search.found;
-    }
-    void diagnose() {
-        std::wcerr << L"UI state: tabs=" << count() << L" title=" << text(window) << L" status=" << status(5) << L'\n';
-        EnumWindows([](HWND hwnd, LPARAM) -> BOOL {
-            DWORD pid = 0; GetWindowThreadProcessId(hwnd, &pid);
-            if (pid != GetCurrentProcessId()) return TRUE;
-            wchar_t name[80]{}; GetClassNameW(hwnd, name, 80);
-            std::wcerr << L"Window: " << name << L" title=" << text(hwnd) << L" visible=" << IsWindowVisible(hwnd) << L" enabled=" << IsWindowEnabled(hwnd) << L'\n';
-            if (std::wstring(name) == L"#32770") EnumChildWindows(hwnd, [](HWND child, LPARAM) -> BOOL {
-                wchar_t type[80]{}; GetClassNameW(child, type, 80);
-                std::wcerr << L"  Control: " << type << L" id=" << GetDlgCtrlID(child) << L" visible=" << IsWindowVisible(child) << L" enabled=" << IsWindowEnabled(child) << L'\n';
-                return TRUE;
-            }, 0);
-            return TRUE;
-        }, 0);
     }
 };
 }
@@ -174,22 +158,26 @@ int main(int argc, char** argv) {
         }
         {
             WindowSession app({a, fixtures / "broken.pdf", b});
-            try { wait([&] { return app.dialog(false) != nullptr; }, "Corrupt document error not shown"); }
-            catch (...) { app.diagnose(); throw; }
-            const auto errorDialog = app.dialog(false);
-            SendMessageW(GetDlgItem(errorDialog, IDOK), BM_CLICK, 0, 0);
-            wait([&] { return !IsWindow(errorDialog); }, "Error dialog did not close");
+            wait([&] { return IsWindowVisible(GetDlgItem(app.window, IDC_NOTICE)) &&
+                text(GetDlgItem(app.window, IDC_NOTICE)).find(L"broken.pdf") != std::wstring::npos; }, "Corrupt document notice not shown");
             app.loaded(L"Dokumentum-B.pdf", 2);
-            require(app.count() == 2, "corrupt document does not close either valid tab");
+            require(app.count() == 2, "corrupt document shows a notice and preserves both valid tabs");
+            app.command(IDM_DISMISS_NOTICE);
+            require(!IsWindowVisible(GetDlgItem(app.window, IDC_NOTICE)), "error notice can be dismissed independently");
             app.command(IDM_CLOSE); app.loaded(L"Dokumentum-A.pdf", 1);
             require(app.count() == 1, "Ctrl+W command closes only active document");
         }
         {
             WindowSession app({a, fixtures / "encrypted.pdf"});
-            wait([&] { return app.dialog(true) != nullptr; }, "Password dialog not shown");
-            const auto dialog = app.dialog(true);
+            wait([&] { return app.passwordDialog() != nullptr; }, "Password dialog not shown");
+            const auto dialog = app.passwordDialog();
             SetWindowTextW(GetDlgItem(dialog, IDC_PASSWORD), L"spdf-test");
+            MSG queued{}; PeekMessageW(&queued, nullptr, 0, 0, PM_NOREMOVE);
+            const DWORD receiver = GetWindowThreadProcessId(dialog, nullptr);
+            const BOOL attached = AttachThreadInput(GetCurrentThreadId(), receiver, TRUE);
+            SetActiveWindow(dialog);
             SendMessageW(GetDlgItem(dialog, IDOK), BM_CLICK, 0, 0);
+            if (attached) AttachThreadInput(GetCurrentThreadId(), receiver, FALSE);
             wait([&] { return !IsWindow(dialog); }, "Password dialog did not close");
             app.loaded(L"encrypted.pdf", 2);
             require(app.count() == 2, "password dialog opens encrypted PDF alongside existing tab");

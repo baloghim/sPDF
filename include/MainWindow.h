@@ -27,6 +27,7 @@ private:
     void closeTab(DocumentId);
     void syncScroll();
     void promptPassword();
+    void showNotice(const std::wstring&, bool rerender = true);
     void command(int);
     void requestRender();
     void acceptResults();
@@ -41,14 +42,17 @@ private:
     HINSTANCE instance_;
     HWND window_ = nullptr, toolbar_ = nullptr, status_ = nullptr, canvas_ = nullptr, pageEdit_ = nullptr;
     HWND pageTotal_ = nullptr, search_ = nullptr, viewButton_ = nullptr;
+    HWND noticeLabel_ = nullptr, noticeClose_ = nullptr;
     HFONT font_ = nullptr, headingFont_ = nullptr;
     HICON welcomeIcon_ = nullptr, searchIcon_ = nullptr;
     HIMAGELIST images_ = nullptr;
     HBRUSH background_ = nullptr;
+    HBRUSH noticeBrush_ = nullptr;
     std::unique_ptr<PdfRenderer> renderer_;
     TabManager tabs_;
     DocumentTabBar tabBar_;
     std::deque<DocumentId> passwords_;
+    std::wstring notice_;
     RenderResult displayed_;
     int dpi_ = 96, scrollX_ = 0, scrollY_ = 0;
     bool smokeTest_ = false, promptingPassword_ = false, destroying_ = false;

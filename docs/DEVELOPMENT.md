@@ -10,7 +10,7 @@
 - X-es bezárás, Ctrl+W, Ctrl+Tab / Ctrl+Shift+Tab, rövidített fájlnevek, teljes útvonalas eszköztipp, aktív fül kék jelölése; a natív tab control túlcsordulási és billentyűzetkezelése.
 - Önálló dokumentumállapot: oldal, zoom, illesztési mód, megjelenítési forgatás, vízszintes/függőleges görgetési pozíció.
 - Hat külön állapotsormező: oldal, nagyítás, papírméret, fájlméret, nézet, aktuális állapot.
-- A hibás fájl és a jelszó megszakítása csak az érintett új fület zárja; a többi dokumentum nyitva marad.
+- A hibás fájl és a jelszó megszakítása csak az érintett új fület zárja; a többi dokumentum nyitva marad. A fájlhibák a főablak bezárható értesítősávjában látszanak, így több fájl betöltése nem vár modális hibaablakra.
 - Névjegy 0.2.0 verzióval, magyar leírással, kattintható edutech.hu és licenchivatkozással.
 
 A keresés, nyomtatás, Folyamatos és Oldalrendező nézet, szerkesztés, export és beállításmentés letiltott előkészítés. Ezeket nem jelöljük működő funkciónak. A teljes 1.0 megvalósítása továbbra is nyitott.
@@ -25,11 +25,11 @@ A felület csak az aktív nézet teljes felbontású bitképét tartja. Nincs le
 
 ## Végrehajtott helyi ellenőrzések
 
-MinGW-w64 x64 Release fordítás: sikeres. CMake/CTest, Wine 10.0 és Xvfb alatt **3 tesztcsomag, összesen 66 sikeres ellenőrzés**, 0 hiba, 0 kihagyott teszt:
+MinGW-w64 x64 Release fordítás: sikeres. CMake/CTest, Wine 10.0 és Xvfb alatt **3 tesztcsomag, összesen 67 sikeres ellenőrzés**, 0 hiba, 0 kihagyott teszt:
 
 - `pdfium_integration`: **22 ellenőrzés**, beleértve a tényleges színes képtartalmat, szövegréteget, jelszót, Unicode-útvonalat, eredeti fájl változatlanságát és 150%-os DPI melletti pixelskálázást.
 - `document_tabs`: **27 ellenőrzés**; stabil azonosítók, állapotmegőrzés, duplikáció, fülbezárás, két PDFium-dokumentum, inaktív render tiltása, hibás dokumentum elkülönítése és gyors egymás utáni nyitás/bezárás.
-- `window_tabs`: **17 ellenőrzés** a valódi megosztott Win32 felületen, külön GUI-szálon. Valódi fülkattintás, X és Ctrl+W, hat státuszmező, 1366×768 és szűk ablak, nagyított oldal görgetése, visszaálló képtartalom képpontos összehasonlítása, hibás és jelszavas PDF párbeszéde.
+- `window_tabs`: **18 ellenőrzés** a valódi megosztott Win32 felületen, külön GUI-szálon. Valódi fülkattintás, X és Ctrl+W, hat státuszmező, 1366×768 és szűk ablak, nagyított oldal görgetése, visszaálló képtartalom képpontos összehasonlítása, hibás PDF értesítősávja és jelszavas PDF párbeszéde.
 
 A Win32 felület tesztje ugyanabban a tesztfolyamatban futtatja a megosztott ablakmodult, mert a Wine folyamatközi `WM_PRINT`/GDI támogatása korlátozott. A fő EXE-t külön `--smoke-test` is ellenőrzi; a kibontott ZIP-ből két Unicode-nevű PDF megnyitása és megjelenítése sikeres, kilépési kód 0.
 
@@ -40,6 +40,9 @@ A helyi `sPDF-0.2.0-preview-win-x64.zip` CPack-csomag egyetlen `sPDF` mappát é
 - A tab control natív elrendezési lépését megtartottuk az egyedi kirajzolás előtt; így a fülek és a túlcsordulási vezérlő helyzete helyes marad.
 - A natív toolbar címkézett és csak ikonos gombjainak szélessége külön beállítást kapott, így a szöveges Megnyitás gomb nem növeli meg az összes ikongombot.
 - A felületi teszt tényleges görgetési hibát talált: fülváltáskor az újra megjelenő görgetősáv néhány pixellel csökkenthette a visszaállított pozíciót. A sávok láthatósága most a tárolt pozíció korlátozása előtt rendeződik. A javítást a kirajzolt oldal képpontos visszaállítási tesztje ellenőrzi.
+
+- Fülváltáskor a státusz csak az új bitmap megérkezése után mutat készenléti állapotot, így a vezérlők sem jeleznek idő előtt kész oldalt.
+- A Windows párbeszédteszt inicializált, látható jelszómezőt/gombot vár és valódi gombkattintást küld. A fájlhiba tesztje a főablak látható értesítősávját és annak bezárását ellenőrzi.
 
 ## Képernyőkép
 

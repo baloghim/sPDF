@@ -52,6 +52,7 @@ MainWindow::~MainWindow() {
     if (welcomeIcon_) DestroyIcon(welcomeIcon_);
     if (searchIcon_) DestroyIcon(searchIcon_);
     if (background_) DeleteObject(background_);
+    if (noticeBrush_) DeleteObject(noticeBrush_);
 }
 bool MainWindow::create(int show, const std::vector<std::wstring>& paths, bool smoke) {
     smokeTest_ = smoke;
@@ -93,6 +94,7 @@ void MainWindow::makeControls() {
         if (const UINT dpi = getDpi(window_)) dpi_ = static_cast<int>(dpi);
     }
     background_ = CreateSolidBrush(RGB(255, 255, 255));
+    noticeBrush_ = CreateSolidBrush(RGB(255, 245, 225));
     toolbar_ = CreateWindowExW(0, TOOLBARCLASSNAMEW, nullptr, WS_CHILD | WS_VISIBLE |
         TBSTYLE_FLAT | TBSTYLE_TOOLTIPS | TBSTYLE_LIST | CCS_NORESIZE | CCS_NOPARENTALIGN | CCS_NODIVIDER,
         0, 0, 0, 0, window_, reinterpret_cast<HMENU>(IDC_TOOLBAR), instance_, nullptr);
@@ -114,6 +116,10 @@ void MainWindow::makeControls() {
     EnableWindow(search_, FALSE);
     viewButton_ = CreateWindowExW(0, L"BUTTON", L"Egy oldal  ▼", WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON,
         0, 0, 0, 0, window_, reinterpret_cast<HMENU>(IDM_VIEWMENU), instance_, nullptr);
+    noticeLabel_ = CreateWindowExW(0, L"STATIC", L"", WS_CHILD | SS_LEFT,
+        0, 0, 0, 0, window_, reinterpret_cast<HMENU>(IDC_NOTICE), instance_, nullptr);
+    noticeClose_ = CreateWindowExW(0, L"BUTTON", L"Bezárás", WS_CHILD | WS_TABSTOP | BS_PUSHBUTTON,
+        0, 0, 0, 0, window_, reinterpret_cast<HMENU>(IDM_DISMISS_NOTICE), instance_, nullptr);
     SendMessageW(pageEdit_, EM_SETLIMITTEXT, 7, 0);
     SetWindowSubclass(pageEdit_, pageProc, 1, reinterpret_cast<DWORD_PTR>(this));
     SetWindowTheme(toolbar_, L"Explorer", nullptr); SetWindowTheme(viewButton_, L"Explorer", nullptr);
@@ -128,7 +134,7 @@ void MainWindow::rebuildToolbar() {
         OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH, L"Segoe UI");
     headingFont_ = CreateFontW(-px(16), 0, 0, 0, FW_SEMIBOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
         OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH, L"Segoe UI");
-    for (HWND control : {pageEdit_, pageTotal_, search_, status_, toolbar_, viewButton_})
+    for (HWND control : {pageEdit_, pageTotal_, search_, status_, toolbar_, viewButton_, noticeLabel_, noticeClose_})
         SendMessageW(control, WM_SETFONT, reinterpret_cast<WPARAM>(font_), TRUE);
     tabBar_.style(font_, dpi_);
     while (SendMessageW(toolbar_, TB_BUTTONCOUNT, 0, 0)) SendMessageW(toolbar_, TB_DELETEBUTTON, 0, 0);
@@ -184,7 +190,15 @@ void MainWindow::layout() {
     MoveWindow(tabBar_.handle(), 0, tabsTop, area.right, tabHeight, TRUE); tabBar_.resize(area.right);
     const int extra = compact ? px(36) : 0;
     MoveWindow(viewButton_, compact ? px(14) : area.right - px(186), compact ? tabsTop + tabHeight + px(3) : top + px(11), px(168), px(28), TRUE);
-    const int canvasTop = tabsTop + tabHeight + extra;
+    const int noticeTop = tabsTop + tabHeight + extra;
+    const int noticeHeight = notice_.empty() ? 0 : px(52);
+    ShowWindow(noticeLabel_, notice_.empty() ? SW_HIDE : SW_SHOW);
+    ShowWindow(noticeClose_, notice_.empty() ? SW_HIDE : SW_SHOW);
+    if (noticeHeight) {
+        MoveWindow(noticeLabel_, px(18), noticeTop + px(9), std::max(px(100), static_cast<int>(area.right) - px(122)), px(36), TRUE);
+        MoveWindow(noticeClose_, area.right - px(92), noticeTop + px(12), px(76), px(28), TRUE);
+    }
+    const int canvasTop = noticeTop + noticeHeight;
     MoveWindow(canvas_, 0, canvasTop, area.right, std::max(1L, area.bottom - canvasTop - statusHeight), TRUE);
     int parts[] = {area.right * 18 / 100, area.right * 30 / 100, area.right * 49 / 100,
         area.right * 63 / 100, area.right * 81 / 100, -1};
@@ -204,6 +218,13 @@ void MainWindow::paintHeader() {
     DrawTextW(dc, text.c_str(), -1, &count, DT_SINGLELINE | DT_VCENTER);
     RECT searchRect{}; GetWindowRect(search_, &searchRect); MapWindowPoints(nullptr, window_, reinterpret_cast<POINT*>(&searchRect), 2);
     DrawIconEx(dc, searchRect.left - px(28), px(11), searchIcon_, px(20), px(20), 0, nullptr, DI_NORMAL);
+    if (!notice_.empty()) {
+        RECT label{}; GetWindowRect(noticeLabel_, &label); MapWindowPoints(nullptr, window_, reinterpret_cast<POINT*>(&label), 2);
+        RECT band{0, label.top - px(9), client.right, label.top + px(43)};
+        FillRect(dc, &band, noticeBrush_);
+        RECT accent{0, band.top, px(4), band.bottom}; HBRUSH stripe = CreateSolidBrush(RGB(211, 140, 31));
+        FillRect(dc, &accent, stripe); DeleteObject(stripe);
+    }
     SelectObject(dc, previous); EndPaint(window_, &paint);
 }
 void MainWindow::openDialog() {
@@ -290,6 +311,11 @@ void MainWindow::promptPassword() {
         SecureZeroMemory(context.value.data(), context.value.size() * sizeof(wchar_t));
     }
 }
+void MainWindow::showNotice(const std::wstring& message, bool rerender) {
+    notice_ = message; SetWindowTextW(noticeLabel_, notice_.c_str()); layout();
+    if (rerender) requestRender();
+    InvalidateRect(window_, nullptr, FALSE);
+}
 void MainWindow::acceptResults() {
     for (auto& result : renderer_->takeResults()) {
         auto* tab = tabs_.find(result.documentId);
@@ -303,10 +329,10 @@ void MainWindow::acceptResults() {
                 tab->passwordPending = true; passwords_.push_back(tab->id); updateControls();
                 PostMessageW(window_, PasswordMessage, 0, 0); continue;
             }
-            const auto text = filename(tab->path) + L"\n\n" + result.error;
+            const auto text = result.error + L" — " + filename(tab->path);
             if (result.operation == RenderOperation::Open) closeTab(tab->id);
             else { if (displayed_.documentId == tab->id) tab->page = displayed_.page; updateControls(); }
-            MessageBoxW(window_, text.c_str(), L"sPDF — Dokumentumhiba", MB_OK | MB_ICONERROR); continue;
+            showNotice(text, result.operation == RenderOperation::Open); continue;
         }
         if (result.operation == RenderOperation::Open) {
             if (result.duplicateOf) {
@@ -378,6 +404,7 @@ void MainWindow::updateControls() {
     }
 }
 void MainWindow::command(int id) {
+    if (id == IDM_DISMISS_NOTICE) { showNotice(L""); return; }
     if (id == IDM_OPEN) { openDialog(); return; }
     if (id == IDM_EXIT) { DestroyWindow(window_); return; }
     if (id == IDM_ABOUT) {
@@ -613,7 +640,13 @@ LRESULT MainWindow::message(UINT message, WPARAM wparam, LPARAM lparam) {
         }
         DragFinish(drop); return 0;
     }
-    case WM_CTLCOLORSTATIC: SetBkMode(reinterpret_cast<HDC>(wparam), TRANSPARENT); return reinterpret_cast<LRESULT>(background_);
+    case WM_CTLCOLORSTATIC:
+        if (reinterpret_cast<HWND>(lparam) == noticeLabel_) {
+            SetTextColor(reinterpret_cast<HDC>(wparam), RGB(122, 77, 15));
+            SetBkColor(reinterpret_cast<HDC>(wparam), RGB(255, 245, 225));
+            return reinterpret_cast<LRESULT>(noticeBrush_);
+        }
+        SetBkMode(reinterpret_cast<HDC>(wparam), TRANSPARENT); return reinterpret_cast<LRESULT>(background_);
     case PdfRenderer::ResultMessage: if (!destroying_) acceptResults(); return 0;
     case DocumentTabBar::CloseMessage: closeTab(static_cast<DocumentId>(wparam)); return 0;
     case PasswordMessage: promptPassword(); return 0;

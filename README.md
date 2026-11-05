@@ -16,7 +16,7 @@ A forráskód jelenleg a **0.2.0-preview** mérföldkövet tartalmazza: új, vil
 - Fülek fájlnévvel, teljes útvonalat mutató eszköztippel, kijelölt állapottal és X bezárógombbal; sok fül esetén natív túlcsordulási vezérlő.
 - Fülenként megmaradó oldalszám, nagyítás/illesztés, ideiglenes forgatás és görgetési hely.
 - Ismételt megnyitáskor a meglévő fül aktiválása; a munkaszál fájlazonosító alapján is felismeri az azonos dokumentumot.
-- Egy hibás vagy megszakított jelszókérésű PDF megnyitása nem zárja be a többi dokumentumot.
+- Egy hibás vagy megszakított jelszókérésű PDF megnyitása nem zárja be a többi dokumentumot. A fájlhibák bezárható értesítősávban jelennek meg, a többi PDF betöltése folytatódik.
 - Megmaradt PDFium-megjelenítés, lapozás, nagyítás, illesztés, görgetés, Unicode-fájlnév és jelszókérés.
 - Hat elkülönített állapotsormező: oldal, nagyítás, papírméret, fájlméret, nézet, műveleti állapot.
 

@@ -8,7 +8,7 @@ Az sPDF Megtekintő **0.2.0-preview** kiadása: új világos Win32 főablak és 
 - Több PDF megnyitása egy választással, behúzással vagy parancssorból; duplikált fájl esetén a meglévő fül aktiválása.
 - Fülenként megmaradó oldal, nagyítás/illesztés, forgatás és görgetési pozíció.
 - X-es és Ctrl+W-s bezárás, Ctrl+Tab / Ctrl+Shift+Tab fülváltás, hosszú fájlnevek rövidítése és teljesútvonal-eszköztipp.
-- Hibás vagy jelszavas dokumentumok kezelése a többi fül elvesztése nélkül.
+- Hibás vagy jelszavas dokumentumok kezelése a többi fül elvesztése nélkül. A fájlhibák bezárható értesítősávban jelennek meg.
 - A háttérfülek nem renderelnek, a PDFiumot egyetlen munkaszál használja. Az eredeti PDF-ek továbbra is kizárólag olvashatók.
 
 A kiadás a GitHub Actions **natív Windows x64 MSVC Release buildjéből** készült, csak sikeres PDFium-, dokumentumfül- és felületi integrációs tesztek, elsőoldal-megjelenítési próba és ZIP-/DLL-ellenőrzés után. A `.sha256` fájl a csomag ellenőrzőösszege.
