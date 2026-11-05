@@ -1,0 +1,6 @@
+/build*/
+/dist/
+/.deps/
+__pycache__/
+*.user
+sPDF.ini

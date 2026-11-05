@@ -1,0 +1,8 @@
+# Preserve PDF offsets and binary resources on Windows checkouts.
+*.pdf binary
+*.ico binary
+*.png binary
+*.gz binary
+# Keep upstream license notices and the original specification verbatim.
+LICENSES/** -whitespace
+docs/SPECIFICATION.md -text whitespace=cr-at-eol

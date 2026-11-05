@@ -1,0 +1,91 @@
+#pragma code_page(65001)
+#include <windows.h>
+#include "resource.h"
+1 RT_MANIFEST "app.manifest"
+IDI_APP ICON "icons/application-pdf.ico"
+IDI_OPEN ICON "icons/document-open.ico"
+IDI_PREVIOUS ICON "icons/go-previous.ico"
+IDI_NEXT ICON "icons/go-next.ico"
+IDI_ZOOMIN ICON "icons/zoom-in.ico"
+IDI_ZOOMOUT ICON "icons/zoom-out.ico"
+IDI_FITPAGE ICON "icons/zoom-fit-best.ico"
+IDI_FITWIDTH ICON "icons/zoom-fit-width.ico"
+IDI_ROTATE ICON "icons/object-rotate-right.ico"
+IDR_MENU MENU
+BEGIN
+  POPUP "&Fájl"
+  BEGIN
+    MENUITEM "&Megnyitás…\tCtrl+O", IDM_OPEN
+    MENUITEM "Dokumentum &bezárása\tCtrl+W", IDM_CLOSE
+    MENUITEM SEPARATOR
+    MENUITEM "&Kilépés\tAlt+F4", IDM_EXIT
+  END
+  POPUP "&Nézet"
+  BEGIN
+    MENUITEM "&Előző oldal\tPgUp", IDM_PREVIOUS
+    MENUITEM "&Következő oldal\tPgDn", IDM_NEXT
+    MENUITEM "Első oldal\tCtrl+Home", IDM_FIRST
+    MENUITEM "Utolsó oldal\tCtrl+End", IDM_LAST
+    MENUITEM SEPARATOR
+    MENUITEM "Nagyítás\tCtrl++", IDM_ZOOMIN
+    MENUITEM "Kicsinyítés\tCtrl+-", IDM_ZOOMOUT
+    MENUITEM "Teljes &oldal", IDM_FITPAGE
+    MENUITEM "Oldal&szélességhez illesztés", IDM_FITWIDTH
+    MENUITEM "100%", IDM_ACTUALSIZE
+    MENUITEM "Forgatás jobbra (csak megjelenítés)", IDM_ROTATE
+  END
+  POPUP "&Súgó"
+  BEGIN
+    MENUITEM "Billentyűparancsok", IDM_SHORTCUTS
+    MENUITEM "Licencek és köszönetnyilvánítás", IDM_LICENSES
+    MENUITEM "&Névjegy…", IDM_ABOUT
+  END
+END
+IDR_ACCELERATORS ACCELERATORS
+BEGIN
+  "O", IDM_OPEN, VIRTKEY, CONTROL
+  "W", IDM_CLOSE, VIRTKEY, CONTROL
+  VK_PRIOR, IDM_PREVIOUS, VIRTKEY
+  VK_NEXT, IDM_NEXT, VIRTKEY
+  VK_HOME, IDM_FIRST, VIRTKEY, CONTROL
+  VK_END, IDM_LAST, VIRTKEY, CONTROL
+  VK_ADD, IDM_ZOOMIN, VIRTKEY, CONTROL
+  VK_SUBTRACT, IDM_ZOOMOUT, VIRTKEY, CONTROL
+  VK_OEM_PLUS, IDM_ZOOMIN, VIRTKEY, CONTROL
+  VK_OEM_MINUS, IDM_ZOOMOUT, VIRTKEY, CONTROL
+  VK_F1, IDM_SHORTCUTS, VIRTKEY
+END
+IDD_PASSWORD DIALOGEX 0, 0, 270, 100
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Jelszóval védett PDF"
+FONT 9, "Segoe UI"
+BEGIN
+  LTEXT "A dokumentum megnyitásához adja meg a jelszót:", -1, 12, 12, 245, 22
+  EDITTEXT IDC_PASSWORD, 12, 36, 245, 16, ES_PASSWORD | ES_AUTOHSCROLL
+  DEFPUSHBUTTON "Megnyitás", IDOK, 125, 70, 64, 18
+  PUSHBUTTON "Mégse", IDCANCEL, 195, 70, 62, 18
+END
+1 VERSIONINFO
+FILEVERSION 0,1,0,0
+PRODUCTVERSION 0,1,0,0
+FILEFLAGSMASK 0x3fL
+FILEFLAGS VS_FF_PRERELEASE
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040e04b0"
+    BEGIN
+      VALUE "FileDescription", "sPDF Megtekintő"
+      VALUE "FileVersion", "0.1.0-preview"
+      VALUE "ProductName", "sPDF Megtekintő"
+      VALUE "ProductVersion", "0.1.0-preview"
+      VALUE "OriginalFilename", "sPDF.exe"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x040e, 1200
+  END
+END
