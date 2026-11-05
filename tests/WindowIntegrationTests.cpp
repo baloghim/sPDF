@@ -102,7 +102,9 @@ struct WindowSession {
         EnumWindows([](HWND hwnd, LPARAM context) -> BOOL {
             auto* s = reinterpret_cast<Search*>(context); DWORD pid = 0; GetWindowThreadProcessId(hwnd, &pid);
             wchar_t name[64]{}; GetClassNameW(hwnd, name, 64);
-            if (pid == s->pid && std::wstring(name) == L"#32770" &&
+            const HWND confirm = GetDlgItem(hwnd, IDOK);
+            if (pid == s->pid && std::wstring(name) == L"#32770" && IsWindowVisible(hwnd) && IsWindowEnabled(hwnd) &&
+                confirm && IsWindowVisible(confirm) && IsWindowEnabled(confirm) &&
                 (GetDlgItem(hwnd, IDC_PASSWORD) != nullptr) == s->password) { s->found = hwnd; return FALSE; }
             return TRUE;
         }, reinterpret_cast<LPARAM>(&search));
@@ -155,7 +157,10 @@ int main(int argc, char** argv) {
         {
             WindowSession app({a, fixtures / "broken.pdf", b});
             wait([&] { return app.dialog(false) != nullptr; }, "Corrupt document error not shown");
-            SendMessageW(app.dialog(false), WM_COMMAND, IDOK, 0); app.loaded(L"Dokumentum-B.pdf", 2);
+            const auto errorDialog = app.dialog(false);
+            SendMessageW(GetDlgItem(errorDialog, IDOK), BM_CLICK, 0, 0);
+            wait([&] { return !IsWindow(errorDialog); }, "Error dialog did not close");
+            app.loaded(L"Dokumentum-B.pdf", 2);
             require(app.count() == 2, "corrupt document does not close either valid tab");
             app.command(IDM_CLOSE); app.loaded(L"Dokumentum-A.pdf", 1);
             require(app.count() == 1, "Ctrl+W command closes only active document");
@@ -164,7 +169,9 @@ int main(int argc, char** argv) {
             WindowSession app({a, fixtures / "encrypted.pdf"});
             wait([&] { return app.dialog(true) != nullptr; }, "Password dialog not shown");
             const auto dialog = app.dialog(true);
-            SetWindowTextW(GetDlgItem(dialog, IDC_PASSWORD), L"spdf-test"); SendMessageW(dialog, WM_COMMAND, IDOK, 0);
+            SetWindowTextW(GetDlgItem(dialog, IDC_PASSWORD), L"spdf-test");
+            SendMessageW(GetDlgItem(dialog, IDOK), BM_CLICK, 0, 0);
+            wait([&] { return !IsWindow(dialog); }, "Password dialog did not close");
             app.loaded(L"encrypted.pdf", 2);
             require(app.count() == 2, "password dialog opens encrypted PDF alongside existing tab");
             app.command(IDM_CLOSE); app.loaded(L"Dokumentum-A.pdf", 1);
