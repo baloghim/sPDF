@@ -18,20 +18,22 @@ jobs:
         run: cmake --build build --config Release --parallel 2
       - name: Test actual Windows PDFium DLL
         id: tests
-        shell: pwsh
+        shell: cmd
         run: |
-          $PSNativeCommandUseErrorActionPreference = $false
-          ctest --test-dir build -C Release --output-on-failure --no-tests=error -V *> build/test-output.txt
-          $testExit = $LASTEXITCODE
-          Get-Content build/test-output.txt
-          exit $testExit
+          ctest --test-dir build -C Release --output-on-failure --no-tests=error -V > build\test-output.txt 2>&1
+          set "SPDF_TEST_EXIT=%ERRORLEVEL%"
+          type build\test-output.txt
+          exit /b %SPDF_TEST_EXIT%
       - name: Report Windows integration tests
         if: always()
         shell: pwsh
         env:
           TEST_OUTCOME: ${{ steps.tests.outcome }}
         run: |
-          if (-not (Test-Path build/test-output.txt)) { exit 0 }
+          if (-not (Test-Path build/test-output.txt)) {
+            Write-Output '::error title=Missing CTest output::The test command did not create build/test-output.txt.'
+            exit 1
+          }
           '## Windows integration tests' | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           '```text' | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           Get-Content build/test-output.txt | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
