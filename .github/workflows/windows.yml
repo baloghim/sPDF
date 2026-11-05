@@ -13,7 +13,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Configure Windows x64 (static MSVC runtime)
-        run: cmake -S . -B build -A x64 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+        id: configure
+        shell: cmd
+        run: |
+          cmake -S . -B build -A x64 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON > configure-output.txt 2>&1
+          set "SPDF_CONFIGURE_EXIT=%ERRORLEVEL%"
+          type configure-output.txt
+          exit /b %SPDF_CONFIGURE_EXIT%
       - name: Build
         run: cmake --build build --config Release --parallel 2
       - name: Test actual Windows PDFium DLL
@@ -29,7 +35,15 @@ jobs:
         shell: pwsh
         env:
           TEST_OUTCOME: ${{ steps.tests.outcome }}
+          CONFIGURE_OUTCOME: ${{ steps.configure.outcome }}
         run: |
+          if ($env:CONFIGURE_OUTCOME -eq 'failure' -and (Test-Path configure-output.txt)) {
+            $configReport = Get-Content configure-output.txt -Raw
+            if ($configReport.Length -gt 3000) { $configReport = $configReport.Substring($configReport.Length - 3000) }
+            $escapedConfig = $configReport.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            Write-Output "::error title=Windows CMake report::$escapedConfig"
+          }
+          if ($env:TEST_OUTCOME -eq 'skipped') { exit 0 }
           if (-not (Test-Path build/test-output.txt)) {
             Write-Output '::error title=Missing CTest output::The test command did not create build/test-output.txt.'
             exit 1
